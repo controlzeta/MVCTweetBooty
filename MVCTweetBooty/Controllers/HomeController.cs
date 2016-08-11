@@ -8,10 +8,10 @@ namespace MVCTweetBooty.Controllers
 {
     public class HomeController : Controller
     {
-        public ActionResult Index()
+        public ActionResult Index(MVCTweetBooty.Models.HomeModels m)
         {
             ViewBag.Message = "Modify this template to jump-start your ASP.NET MVC application.";
-
+            m.Connect();
             return View();
         }
 
