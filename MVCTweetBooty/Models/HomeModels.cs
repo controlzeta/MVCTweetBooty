@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Script.Serialization;
 using TweetSharp;
 
 namespace MVCTweetBooty.Models
 {
     public class HomeModels
     {
-        public string _consumerKey = "";
-        public string _consumerSecret = "";
-        public string _accessToken = "";
-        public string _accessTokenSecret = "";
+        string _consumerKey = "";
+        string _consumerSecret = "";
+        string _accessToken = "";
+        string _accessTokenSecret = "";
 
         public TwitterService service;  
         public static string[] fileEntries;
@@ -35,10 +36,56 @@ namespace MVCTweetBooty.Models
         public List<TwitterHashTag> hashtagsDistintos = new List<TwitterHashTag>();
         public List<TwitterUser> friendList = new List<TwitterUser>();
 
+        public TwitterSearchResult results = new TwitterSearchResult();
+        public string Statuses = "";
+
+        public HomeModels()
+        {
+            Connect();
+            Search("GreatAss pic");
+        }
+
         public void Connect()
         {
             service = new TwitterService(_consumerKey, _consumerSecret);
             service.AuthenticateWith(_accessToken, _accessTokenSecret);
+        }
+
+        public void Init()
+        {
+            
+        }
+
+        public void RateLimit(TwitterRateLimitStatus rate)
+        {
+            string rateLimit = "You have used " + rate.RemainingHits + " out of your " + rate.HourlyLimit;
+            rateLimit += "You have to wait: " + rate.ResetTimeInSeconds / 60 + " minutes or to " + rate.ResetTime.ToLongTimeString();
+        }
+
+        private TwitterSearchResult Search(string query)
+        {
+            SearchOptions search = new SearchOptions();
+            results = new TwitterSearchResult();
+            search.Q = query;
+            search.Count = 50;
+            search.IncludeEntities = true;
+            search.Resulttype = TwitterSearchResultType.Mixed;
+            results = service.Search(search);
+            RateLimit(service.Response.RateLimitStatus);
+            return results;
+        }
+
+        public List<TwitterStatus> GetBestTweets()
+        {
+            List<TwitterStatus> statuses = new List<TwitterStatus>();
+            TwitterSearchResult tweets = Search("putas pic");
+            if (tweets != null)
+            {
+                statuses = (from x in tweets.Statuses
+                            orderby x.RetweetCount
+                            select x).ToList();
+            }
+            return statuses;
         }
     }
 }

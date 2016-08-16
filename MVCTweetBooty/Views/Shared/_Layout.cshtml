@@ -9,6 +9,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         @Styles.Render("~/Content/css")
         @Scripts.Render("~/bundles/modernizr")
+        @Scripts.Render("~/bundles/jquery")
+        @RenderSection("scripts", required: false)
     </head>
     <body>
         <div class="container">
@@ -24,7 +26,6 @@
                         </button>
                         <a class="navbar-brand" href="#">@Html.ActionLink("TweetBooty", "Index", "Home", new { @class= "navbar-brand"})</a>
                     </div>
-
                     <!-- Collect the nav links, forms, and other content for toggling -->
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                         <ul class="nav navbar-nav">
@@ -51,7 +52,7 @@
                     </div><!-- /.navbar-collapse -->
                 </div><!-- /.container-fluid -->
             </nav>
-            <div class="row">
+            <div class="row" style="">
                 <div class="col-md-8">
                     <div class="panel panel-default">
                         <div class="panel-body">
@@ -81,13 +82,12 @@
                         </div>
                     </div>
                 </div>
-                    </div>
-                    <div class="row" style="min-height:450px;">
-                        @RenderSection("featured", required: false)
-                        <section class="">
-                            @RenderBody()
-                        </section>
-                    </div>
+            </div>
+            <div class="row">
+                <div style="min-height: 450px; padding-top: 15px;">
+                    @RenderBody()
+                </div>
+            </div>
                     <footer>
                         <div class="row">
                             <div class="text-center">
@@ -96,7 +96,5 @@
                         </div>
                     </footer>
                 </div>
-        @Scripts.Render("~/bundles/jquery")
-        @RenderSection("scripts", required: false)
     </body>
 </html>
