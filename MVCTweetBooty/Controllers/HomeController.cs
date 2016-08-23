@@ -11,7 +11,7 @@ namespace MVCTweetBooty.Controllers
     {
         public ActionResult Index(MVCTweetBooty.Models.HomeModels m)
         {
-            ViewBag.Message = "Modify this template to jump-start your ASP.NET MVC application.";
+            m.Init();
             return View(m);
         }
 
@@ -19,10 +19,17 @@ namespace MVCTweetBooty.Controllers
         public ActionResult GetFooString()
         {
             HomeModels m = new HomeModels();
-            m.Connect();
             m.Init();
             return Json(m);
         } // end GetFooString
+
+        [HttpPost]
+        public JsonResult GetHashtagByCountry(int id)
+        {
+            HomeModels m = new HomeModels();
+            m.GetTrendingTopicsById(id);
+            return Json(m.TrendList);
+        }
 
         public ActionResult About()
         {

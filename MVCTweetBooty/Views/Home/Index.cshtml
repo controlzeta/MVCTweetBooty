@@ -10,6 +10,7 @@
                     <div class="input-group">
                         <span class="input-group-addon" id="basic-addon1">Search</span>
                         @Html.TextBoxFor(m => m.query, new { @class = "form-control", @placeholder = "Type your query" })
+                        
                         @*<input type="text" class="form-control" placeholder="Type your Query" aria-describedby="basic-addon1">*@
                     </div>
                 </div>
@@ -32,7 +33,7 @@
             <div class="">
                 <div class="input-group">
                     <span class="input-group-addon" id="basic-addon1">Hashtags</span>
-                    <select type="text" class="form-control" placeholder="Type your Query" aria-describedby="basic-addon1"></select>
+                    @Html.DropDownListFor(m => m.CountryId, new SelectList(Model.Countries, "Value", "Text"),  new { @class = "form-control" })
                 </div>
             </div>
         </div>
@@ -76,34 +77,78 @@
 </div>
 @Html.LabelFor(m => m.Statuses)
 <script>
-    var Tweets;
+    var Tweets; var Hashtags;
     $(document).ready(function () {
-        $('#HashtagsDT').DataTable();
-        $.ajax({
-            //cache: false,
-            type: "POST",
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            url: "/Home/GetFooString",
-            //data: {},
-            success: function (data) {
-                Tweets = data.results.Statuses;
-                console.log(data.results);
-                $('#TweetsDT').DataTable({
-                    "data":     Tweets,
-                    "columns": [
-                            { "data": "IdStr" },
-                            { "data": "Author.ScreenName" },
-                            { "data": "TextAsHtml" },
-                            { "data": "RetweetCount" }
-                               ]
-                });
-            },
-            error: function (xhr, ajaxOptions, thrownError) {
-                console.log(xhr.error);
-                alert("Ajax Failed!!!");
-            }
-        }); // end ajax call
+        //$('#HashtagsDT').DataTable();
+        //$.ajax({
+        //    //cache: false,
+        //    type: "POST",
+        //    contentType: "application/json; charset=utf-8",
+        //    dataType: 'json',
+        //    url: "/Home/GetFooString",
+        //    //data: {},
+        //    success: function (data) {
+        //        Tweets = data.results.Statuses;
+        //        console.log(data.results);
+        //        $('#TweetsDT').DataTable({
+        //            "destroy": true,
+        //            "data":     Tweets,
+        //            "columns": [
+        //                    { "data": "IdStr" },
+        //                    { "data": "Author.ScreenName" },
+        //                    { "data": "TextAsHtml" },
+        //                    { "data": "RetweetCount" }
+        //                       ]
+        //        });
+        //    },
+        //    error: function (xhr, ajaxOptions, thrownError) {
+        //        console.log(xhr.error);
+        //        alert("Ajax Failed!!!");
+        //    }
+        //}); // end ajax call
+
+        $("#CountryId").change(function () {
+            var table = $('#HashtagsDT').DataTable();
+            table.destroy();
+            $('#HashtagsDT').empty();
+            $.ajax({
+                //cache: false,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                url: "/Home/GetHashtagByCountry",
+                data: "{ id: " + $('#CountryId').val() + " }",
+                success: function (data) {
+                    Hashtags = data;
+                    console.log(data);
+                    $('#HashtagsDT').DataTable({
+                        "destroy": true,
+                        "data": data,
+                        "columns": [
+                                { "data": "Name" },
+								{ "data": "Url" }
+                        ],
+                        "columnDefs": [
+						{
+						    "title": "Hashtag",
+						    "targets": 0,
+						    "render": function (data, type, row) {
+						        return '<a href="' + row["Url"] + '" target="_blank"> ' + data + '</a>';
+						    }
+						},
+						{
+						    "targets": 1,
+						    "searchable": false,
+						    "visible": false
+						}]
+                    });
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    console.log(xhr.error);
+                    alert("Ajax Failed!!!");
+                }
+            }); // end ajax call
+        });
     });
 </script>
 

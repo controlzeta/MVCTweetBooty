@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Script.Serialization;
+using System.Web.WebPages.Html;
 using TweetSharp;
 
 namespace MVCTweetBooty.Models
@@ -36,6 +37,10 @@ namespace MVCTweetBooty.Models
         public List<TwitterHashTag> hashtags = new List<TwitterHashTag>();
         public List<TwitterHashTag> hashtagsDistintos = new List<TwitterHashTag>();
         public List<TwitterUser> friendList = new List<TwitterUser>();
+        public List<TwitterTrend> TrendList = new List<TwitterTrend>();
+        public int CountryId { get; set; }
+        public List<SelectListItem> Countries { get; set; }
+
 
         public TwitterSearchResult results = new TwitterSearchResult();
         public string Statuses = "";
@@ -45,7 +50,7 @@ namespace MVCTweetBooty.Models
         public HomeModels()
         {
             Connect();
-            Search("Nalgapronta");
+            //Search("Nalgapronta");
         }
 
         public void Connect()
@@ -56,7 +61,9 @@ namespace MVCTweetBooty.Models
 
         public void Init()
         {
-            
+            //Connect();
+            GetCountries();
+            GetTrendingTopicsById(0);
         }
 
         public void RateLimit(TwitterRateLimitStatus rate)
@@ -94,19 +101,27 @@ namespace MVCTweetBooty.Models
         public void GetCountries()
         {
             var countries = service.ListAvailableTrendsLocations();
-            //cbTrendingTopics.DisplayMember = "Text";
-            //cbTrendingTopics.ValueMember = "Value";
+            Countries = new List<SelectListItem>();
             foreach (WhereOnEarthLocation country in countries)
             {
-                //ComboboxItem cbi = new ComboboxItem();
-                cbi.Text = country.Country + " - " + country.Name;
-                cbi.Value = country.WoeId;
-                //cbTrendingTopics.Items.Add(cbi);
-                //cbTrendingTopics.Items.Add(new { 
-                //    Text = country.Country + " - " + country.Name , 
-                //    Value = country.WoeId });
-
+                SelectListItem SLI = new SelectListItem();
+                SLI.Text = country.Country + " - " + country.Name;
+                SLI.Value = country.WoeId.ToString();
+                Countries.Add(SLI);
             }
+        }
+
+        public void GetTrendingTopicsById(int id)
+        {
+            ListLocalTrendsForOptions lctfo = new ListLocalTrendsForOptions();
+            lctfo.Id = id == 0 ? 116545 : id; //Mexico City
+            //lctfo.Id = 116545; //Mexico City
+            //lctfo.Id = 134047; //Monterrey
+            //lctfo.Id = 395269; //Caracas
+            //lctfo.Id = 753692; //Barcelona
+            //lctfo.Id = 766273; //Madrid
+            var Trends = service.ListLocalTrendsFor(lctfo);
+            TrendList = Trends.Trends;
         }
     }
 }
