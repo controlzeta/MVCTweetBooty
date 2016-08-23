@@ -18,6 +18,7 @@ namespace MVCTweetBooty.Models
         public static string[] fileEntries;
         public string fullPath;
         public string tweetedPath;
+        public string query = "";
 
         System.Timers.Timer FifteenMinuteTimer = new System.Timers.Timer();
         System.Timers.Timer OneHourTimer = new System.Timers.Timer();
@@ -39,10 +40,12 @@ namespace MVCTweetBooty.Models
         public TwitterSearchResult results = new TwitterSearchResult();
         public string Statuses = "";
 
+        public string rateLimit = "";
+
         public HomeModels()
         {
             Connect();
-            Search("GreatAss pic");
+            Search("Nalgapronta");
         }
 
         public void Connect()
@@ -58,7 +61,7 @@ namespace MVCTweetBooty.Models
 
         public void RateLimit(TwitterRateLimitStatus rate)
         {
-            string rateLimit = "You have used " + rate.RemainingHits + " out of your " + rate.HourlyLimit;
+            rateLimit = "You have used " + rate.RemainingHits + " out of your " + rate.HourlyLimit;
             rateLimit += "You have to wait: " + rate.ResetTimeInSeconds / 60 + " minutes or to " + rate.ResetTime.ToLongTimeString();
         }
 
@@ -86,6 +89,24 @@ namespace MVCTweetBooty.Models
                             select x).ToList();
             }
             return statuses;
+        }
+
+        public void GetCountries()
+        {
+            var countries = service.ListAvailableTrendsLocations();
+            //cbTrendingTopics.DisplayMember = "Text";
+            //cbTrendingTopics.ValueMember = "Value";
+            foreach (WhereOnEarthLocation country in countries)
+            {
+                //ComboboxItem cbi = new ComboboxItem();
+                cbi.Text = country.Country + " - " + country.Name;
+                cbi.Value = country.WoeId;
+                //cbTrendingTopics.Items.Add(cbi);
+                //cbTrendingTopics.Items.Add(new { 
+                //    Text = country.Country + " - " + country.Name , 
+                //    Value = country.WoeId });
+
+            }
         }
     }
 }

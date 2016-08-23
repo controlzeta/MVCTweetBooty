@@ -9,7 +9,8 @@
                 <div class="col-md-6">
                     <div class="input-group">
                         <span class="input-group-addon" id="basic-addon1">Search</span>
-                        <input type="text" class="form-control" placeholder="Type your Query" aria-describedby="basic-addon1">
+                        @Html.TextBoxFor(m => m.query, new { @class = "form-control", @placeholder = "Type your query" })
+                        @*<input type="text" class="form-control" placeholder="Type your Query" aria-describedby="basic-addon1">*@
                     </div>
                 </div>
                 <div class="col-md-2">

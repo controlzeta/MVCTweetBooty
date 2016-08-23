@@ -15,7 +15,7 @@ namespace MVCTweetBooty.Controllers
             return View(m);
         }
 
-    [HttpPost]
+        [HttpPost]
         public ActionResult GetFooString()
         {
             HomeModels m = new HomeModels();
