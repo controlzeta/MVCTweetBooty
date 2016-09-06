@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 using System.Web.Script.Serialization;
-using System.Web.WebPages.Html;
 using TweetSharp;
 
 namespace MVCTweetBooty.Models
@@ -15,7 +15,6 @@ namespace MVCTweetBooty.Models
         string _accessToken = "";
         string _accessTokenSecret = "";
 
-        public TwitterService service;  
         public static string[] fileEntries;
         public string fullPath;
         public string tweetedPath;
@@ -55,8 +54,8 @@ namespace MVCTweetBooty.Models
 
         public void Connect()
         {
-            service = new TwitterService(_consumerKey, _consumerSecret);
-            service.AuthenticateWith(_accessToken, _accessTokenSecret);
+            MvcApplication.service = new TwitterService(_consumerKey, _consumerSecret);
+            MvcApplication.service.AuthenticateWith(_accessToken, _accessTokenSecret);
         }
 
         public void Init()
@@ -80,8 +79,8 @@ namespace MVCTweetBooty.Models
             search.Count = 50;
             search.IncludeEntities = true;
             search.Resulttype = TwitterSearchResultType.Mixed;
-            results = service.Search(search);
-            RateLimit(service.Response.RateLimitStatus);
+            results = MvcApplication.service.Search(search);
+            RateLimit(MvcApplication.service.Response.RateLimitStatus);
             return results;
         }
 
@@ -100,7 +99,7 @@ namespace MVCTweetBooty.Models
 
         public void GetCountries()
         {
-            var countries = service.ListAvailableTrendsLocations();
+            var countries = MvcApplication.service.ListAvailableTrendsLocations();
             Countries = new List<SelectListItem>();
             foreach (WhereOnEarthLocation country in countries)
             {
@@ -120,8 +119,13 @@ namespace MVCTweetBooty.Models
             //lctfo.Id = 395269; //Caracas
             //lctfo.Id = 753692; //Barcelona
             //lctfo.Id = 766273; //Madrid
-            var Trends = service.ListLocalTrendsFor(lctfo);
+            var Trends = MvcApplication.service.ListLocalTrendsFor(lctfo);
             TrendList = Trends.Trends;
+        }
+
+        public void SearchTweets(string Query)
+        {
+            Search(Query);
         }
     }
 }

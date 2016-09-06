@@ -31,6 +31,15 @@ namespace MVCTweetBooty.Controllers
             return Json(m.TrendList);
         }
 
+
+        [HttpPost]
+        public JsonResult SearchTweets(string query)
+        {
+            HomeModels m = new HomeModels();
+            m.SearchTweets(query);
+            return Json(m.results);
+        }
+
         public ActionResult About()
         {
             ViewBag.Message = "Your app description page.";

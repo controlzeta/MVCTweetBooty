@@ -25,7 +25,7 @@
                     </select>
                 </div>
                 <div class="col-md-1">
-                    <a class="btn btn-primary">Search</a>
+                    <a class="btn btn-primary" onclick="Search();">Search</a>
                 </div>
             </div>
         </div>
@@ -78,35 +78,37 @@
 @Html.LabelFor(m => m.Statuses)
 <script>
     var Tweets; var Hashtags;
-    $(document).ready(function () {
-        //$('#HashtagsDT').DataTable();
-        //$.ajax({
-        //    //cache: false,
-        //    type: "POST",
-        //    contentType: "application/json; charset=utf-8",
-        //    dataType: 'json',
-        //    url: "/Home/GetFooString",
-        //    //data: {},
-        //    success: function (data) {
-        //        Tweets = data.results.Statuses;
-        //        console.log(data.results);
-        //        $('#TweetsDT').DataTable({
-        //            "destroy": true,
-        //            "data":     Tweets,
-        //            "columns": [
-        //                    { "data": "IdStr" },
-        //                    { "data": "Author.ScreenName" },
-        //                    { "data": "TextAsHtml" },
-        //                    { "data": "RetweetCount" }
-        //                       ]
-        //        });
-        //    },
-        //    error: function (xhr, ajaxOptions, thrownError) {
-        //        console.log(xhr.error);
-        //        alert("Ajax Failed!!!");
-        //    }
-        //}); // end ajax call
 
+    function Search() {
+        $('#query').val();
+        $.ajax({
+            //cache: false,
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            url: "/Home/SearchTweets",
+            data: "{ query: '" + $('#query').val() + "' }",
+            success: function (data) {
+                console.log(data);
+                $('#TweetsDT').DataTable({
+                    "destroy": true,
+                    "data": data.Statuses,
+                    "columns": [
+                        { "data": "IdStr" },
+                        { "data": "Author.ScreenName" },
+                        { "data": "TextAsHtml" },
+                        { "data": "RetweetCount" }
+                    ]
+                });
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                console.log(xhr.error);
+                alert("Ajax Failed!!!");
+            }
+        }); // end ajax call
+    }
+
+    $(document).ready(function () {
         $("#CountryId").change(function () {
             var table = $('#HashtagsDT').DataTable();
             table.destroy();

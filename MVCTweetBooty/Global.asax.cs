@@ -6,6 +6,7 @@ using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using TweetSharp;
 
 namespace MVCTweetBooty
 {
@@ -14,6 +15,7 @@ namespace MVCTweetBooty
 
     public class MvcApplication : System.Web.HttpApplication
     {
+        public static TwitterService service = new TwitterService();  
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
