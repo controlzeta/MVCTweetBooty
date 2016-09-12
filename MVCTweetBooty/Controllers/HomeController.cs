@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Script.Serialization;
 
 namespace MVCTweetBooty.Controllers
 {
@@ -33,11 +34,15 @@ namespace MVCTweetBooty.Controllers
 
 
         [HttpPost]
-        public JsonResult SearchTweets(string query)
+        public JsonResult SearchTweets(string query, string numberOfResults, string resultsType)
         {
             HomeModels m = new HomeModels();
-            m.SearchTweets(query);
-            return Json(m.results);
+            m.SearchTweets(query, numberOfResults, resultsType);
+            return new JsonResult()
+            {
+                Data = m.results,
+                MaxJsonLength = 86753090
+            };
         }
 
         public ActionResult About()

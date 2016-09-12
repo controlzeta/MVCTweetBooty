@@ -39,7 +39,10 @@ namespace MVCTweetBooty.Models
         public List<TwitterTrend> TrendList = new List<TwitterTrend>();
         public int CountryId { get; set; }
         public List<SelectListItem> Countries { get; set; }
-
+        public List<SelectListItem> ResultsNumber { get; set; }
+        public int idResultNumber { get; set; }
+        public List<SelectListItem> TypeOfResults { get; set; }
+        public int idTypeOfResults;
 
         public TwitterSearchResult results = new TwitterSearchResult();
         public string Statuses = "";
@@ -63,6 +66,34 @@ namespace MVCTweetBooty.Models
             //Connect();
             GetCountries();
             GetTrendingTopicsById(0);
+            InitializeSelects();
+        }
+
+        public void InitializeSelects()
+        {
+            ResultsNumber = new List<SelectListItem>();
+            SelectListItem a = new SelectListItem();
+            for (int i = 1; i < 10; i++)
+            {
+                a = new SelectListItem();
+                a.Text = (i * 10).ToString(); a.Value = (i * 10).ToString();
+                ResultsNumber.Add(a);
+            }
+            for (int i = 1; i < 10; i++)
+            {
+                a = new SelectListItem();
+                if (i == 1)
+                    a.Selected = true;
+                a.Text = (i * 100).ToString(); a.Value = (i * 100).ToString();
+                ResultsNumber.Add(a);
+            }
+            TypeOfResults = new List<SelectListItem>();
+            a = new SelectListItem();
+            a.Text = "Mixed"; a.Value = "0"; TypeOfResults.Add(a);
+            a = new SelectListItem();
+            a.Text = "Recent"; a.Value = "1"; TypeOfResults.Add(a);
+            a = new SelectListItem();
+            a.Text = "Popular"; a.Value = "2"; TypeOfResults.Add(a);
         }
 
         public void RateLimit(TwitterRateLimitStatus rate)
@@ -71,23 +102,38 @@ namespace MVCTweetBooty.Models
             rateLimit += "You have to wait: " + rate.ResetTimeInSeconds / 60 + " minutes or to " + rate.ResetTime.ToLongTimeString();
         }
 
-        private TwitterSearchResult Search(string query)
+        private TwitterSearchResult Search(string query, int numberOfResults, int resultType)
         {
             SearchOptions search = new SearchOptions();
             results = new TwitterSearchResult();
             search.Q = query;
-            search.Count = 50;
+            search.Count = numberOfResults != 0 ? numberOfResults : 50;
             search.IncludeEntities = true;
-            search.Resulttype = TwitterSearchResultType.Mixed;
+            search.Resulttype = ResulTypeOf(resultType);
             results = MvcApplication.service.Search(search);
             RateLimit(MvcApplication.service.Response.RateLimitStatus);
             return results;
         }
 
+        public TwitterSearchResultType ResulTypeOf(int type)
+        { 
+            switch(type)
+            { 
+                case 0:
+                    return TwitterSearchResultType.Mixed;
+                case 1:
+                    return TwitterSearchResultType.Popular;
+                case 2:
+                    return TwitterSearchResultType.Recent;
+                default:
+                    return TwitterSearchResultType.Mixed;
+            }
+        }
+
         public List<TwitterStatus> GetBestTweets()
         {
             List<TwitterStatus> statuses = new List<TwitterStatus>();
-            TwitterSearchResult tweets = Search("putas pic");
+            TwitterSearchResult tweets = Search("putas pic", 0, 0);
             if (tweets != null)
             {
                 statuses = (from x in tweets.Statuses
@@ -123,9 +169,9 @@ namespace MVCTweetBooty.Models
             TrendList = Trends.Trends;
         }
 
-        public void SearchTweets(string Query)
+        public void SearchTweets(string Query, string numberOfResults, string resultType)
         {
-            Search(Query);
+            Search(Query, Convert.ToInt32(numberOfResults) , Convert.ToInt32(resultType));
         }
     }
 }

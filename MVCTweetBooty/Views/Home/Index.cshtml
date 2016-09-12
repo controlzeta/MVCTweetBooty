@@ -10,19 +10,13 @@
                     <div class="input-group">
                         <span class="input-group-addon" id="basic-addon1">Search</span>
                         @Html.TextBoxFor(m => m.query, new { @class = "form-control", @placeholder = "Type your query" })
-                        
-                        @*<input type="text" class="form-control" placeholder="Type your Query" aria-describedby="basic-addon1">*@
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <select class="form-control">
-                        <option>1</option>
-                    </select>
+                    @Html.DropDownListFor(m => m.idResultNumber, new SelectList(Model.ResultsNumber, "Value", "Text"), new { @class = "form-control" })
                 </div>
                 <div class="col-md-2">
-                    <select class="form-control">
-                        <option>Mixed</option>
-                    </select>
+                    @Html.DropDownListFor(m => m.idTypeOfResults, new SelectList(Model.TypeOfResults, "Value","Text"), new { @class = "form-control"})
                 </div>
                 <div class="col-md-1">
                     <a class="btn btn-primary" onclick="Search();">Search</a>
@@ -75,22 +69,27 @@
         </div>
     </div>
 </div>
-@Html.LabelFor(m => m.Statuses)
 <script>
     var Tweets; var Hashtags;
 
     function Search() {
-        $('#query').val();
+        console.log("{ query: '" + $('#query').val() + "' , " +
+            " numberOfResults : " + $('#idResultNumber').val() + " , " +
+            " resultsType : " + $('#idTypeOfResults').val() + " }");
         $.ajax({
             //cache: false,
             type: "POST",
             contentType: "application/json; charset=utf-8",
             dataType: 'json',
             url: "/Home/SearchTweets",
-            data: "{ query: '" + $('#query').val() + "' }",
+            data: "{ query: '" + $('#query').val() + "' , " +
+            " numberOfResults : '" + $('#idResultNumber').val() + "' , " +
+            " resultsType : '" + $('#idTypeOfResults').val() + "' }",
             success: function (data) {
                 console.log(data);
                 $('#TweetsDT').DataTable({
+                    "sDom": '<"top"lf>rt<"bottom"p><"clear">',
+                    "lengthMenu": [[25, 35, 50, -1], [25, 35, 50, "All"]],
                     "destroy": true,
                     "data": data.Statuses,
                     "columns": [
@@ -103,6 +102,8 @@
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 console.log(xhr.error);
+                console.log(thrownError);
+                console.log(ajaxOptions);
                 alert("Ajax Failed!!!");
             }
         }); // end ajax call
@@ -124,6 +125,8 @@
                     Hashtags = data;
                     console.log(data);
                     $('#HashtagsDT').DataTable({
+                        "sDom": '<"top"f>rt<"bottom"lp><"clear">',
+                        "lengthMenu": [[25, 35, 50, -1], [25, 35, 50, "All"]],
                         "destroy": true,
                         "data": data,
                         "columns": [
