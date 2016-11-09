@@ -202,3 +202,5 @@ F:\Documents\GitHub\MVCTweetBooty\MVCTweetBooty\bin\zh-Hant\System.Spatial.resou
 F:\Documents\GitHub\MVCTweetBooty\MVCTweetBooty\obj\Debug\MVCTweetBooty.dll
 F:\Documents\GitHub\MVCTweetBooty\MVCTweetBooty\obj\Debug\MVCTweetBooty.pdb
 F:\Documents\GitHub\MVCTweetBooty\MVCTweetBooty\obj\Debug\MVCTweetBooty.csprojResolveAssemblyReference.cache
+E:\Documents\GitHub\MVCTweetBooty\MVCTweetBooty\bin\log4net.dll
+E:\Documents\GitHub\MVCTweetBooty\MVCTweetBooty\bin\log4net.xml

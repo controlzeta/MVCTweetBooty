@@ -6544,6 +6544,14 @@ button.close {
 .affix {
   position: fixed;
 }
+.bolder {
+    font-weight: bold;
+}
+
+.error {
+    color:red;
+}
+
 @-ms-viewport {
   width: device-width;
 }

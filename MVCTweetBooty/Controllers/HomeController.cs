@@ -32,6 +32,14 @@ namespace MVCTweetBooty.Controllers
             return Json(m.TrendList);
         }
 
+        [HttpPost]
+        public JsonResult Timer(int id)
+        {
+            HomeModels m = new HomeModels();
+            m.RandomTime();
+            return Json(m.secondsLeft);
+        }
+
 
         [HttpPost]
         public JsonResult SearchTweets(string query, string numberOfResults, string resultsType)
@@ -41,6 +49,18 @@ namespace MVCTweetBooty.Controllers
             return new JsonResult()
             {
                 Data = m.results,
+                MaxJsonLength = 86753090
+            };
+        }
+
+        [HttpPost]
+        public JsonResult Tweet(string tweetText)
+        {
+            HomeModels m = new HomeModels();
+            m.SendTweet(tweetText);
+            return new JsonResult()
+            {
+                Data = m,
                 MaxJsonLength = 86753090
             };
         }

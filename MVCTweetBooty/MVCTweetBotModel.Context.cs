@@ -25,5 +25,11 @@ namespace MVCTweetBooty
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<BannedWord> BannedWords { get; set; }
+        public virtual DbSet<Hashtag> Hashtags { get; set; }
+        public virtual DbSet<Link> Links { get; set; }
+        public virtual DbSet<Tweeted> Tweeteds { get; set; }
+        public virtual DbSet<Tweet> Tweets { get; set; }
+        public virtual DbSet<Configuration> Configurations { get; set; }
     }
 }

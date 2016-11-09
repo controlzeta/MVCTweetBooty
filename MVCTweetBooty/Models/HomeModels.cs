@@ -1,6 +1,10 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
@@ -10,15 +14,19 @@ namespace MVCTweetBooty.Models
 {
     public class HomeModels
     {
+        private static readonly ILog log = LogManager.GetLogger(typeof(HomeModels).FullName);
+
         string _consumerKey = "";
         string _consumerSecret = "";
         string _accessToken = "";
         string _accessTokenSecret = "";
 
-        public static string[] fileEntries;
-        public string fullPath;
-        public string tweetedPath;
+        static string[] fileEntries;
+        string fullPath;
+        string tweetedPath;
         public string query = "";
+        public string TweetText = "";
+        public string Errors = "";
 
         System.Timers.Timer FifteenMinuteTimer = new System.Timers.Timer();
         System.Timers.Timer OneHourTimer = new System.Timers.Timer();
@@ -28,6 +36,10 @@ namespace MVCTweetBooty.Models
         public int FavsByTheHour = 0;
         public int FollowsByTheHour = 0;
         public int FifteenMinutes = 0;
+        public int FavCounter = 0;
+        public int TweetCounter = 0;
+        public int FollowCounter = 0;
+        public int NumFotos = 0;
         public int Hours = 0;
         public int minutesLeft = 0;
         public int secondsLeft = 0;
@@ -52,7 +64,7 @@ namespace MVCTweetBooty.Models
         public HomeModels()
         {
             Connect();
-            //Search("Nalgapronta");
+            ScanForMedia();
         }
 
         public void Connect()
@@ -67,6 +79,8 @@ namespace MVCTweetBooty.Models
             GetCountries();
             GetTrendingTopicsById(0);
             InitializeSelects();
+            RateLimit(MvcApplication.service.Response.RateLimitStatus);
+            RandomTime();
         }
 
         public void InitializeSelects()
@@ -98,7 +112,7 @@ namespace MVCTweetBooty.Models
 
         public void RateLimit(TwitterRateLimitStatus rate)
         {
-            rateLimit = "You have used " + rate.RemainingHits + " out of your " + rate.HourlyLimit;
+            rateLimit = "You have used " + rate.RemainingHits + " out of your " + rate.HourlyLimit + " \n";
             rateLimit += "You have to wait: " + rate.ResetTimeInSeconds / 60 + " minutes or to " + rate.ResetTime.ToLongTimeString();
         }
 
@@ -111,7 +125,18 @@ namespace MVCTweetBooty.Models
             search.IncludeEntities = true;
             search.Resulttype = ResulTypeOf(resultType);
             results = MvcApplication.service.Search(search);
+            addLinks(results);
             RateLimit(MvcApplication.service.Response.RateLimitStatus);
+            return results;
+        }
+
+        private TwitterSearchResult addLinks(TwitterSearchResult results)
+        { 
+            foreach(TwitterStatus status in results.Statuses)
+            {
+                string url = "https://twitter.com/";
+                //status.Author.ScreenName = "<a href='" + url + status.Author.ScreenName + "' target='_blank'>@" + status.Author.ScreenName + "</a>";
+            }
             return results;
         }
 
@@ -171,7 +196,232 @@ namespace MVCTweetBooty.Models
 
         public void SearchTweets(string Query, string numberOfResults, string resultType)
         {
-            Search(Query, Convert.ToInt32(numberOfResults) , Convert.ToInt32(resultType));
+            try
+            {
+                Search(Query, Convert.ToInt32(numberOfResults), Convert.ToInt32(resultType));    
+            }
+            catch (Exception ex)
+            {
+                log.Error("No se pudo buscar el query: " + Query, ex);
+            }
         }
+
+        public int RandomTime()
+        {
+            minutesLeft = rand.Next(1, 5);
+            secondsLeft = minutesLeft * 60;
+            return secondsLeft;
+        }
+
+        public bool Tweet(string Status)
+        {
+            try
+            {
+                SendTweetOptions tweet = new SendTweetOptions();
+                tweet.Status = Status;
+                var result = MvcApplication.service.SendTweet(tweet);
+                RateLimit(MvcApplication.service.Response.RateLimitStatus);
+                if (result != null)
+                {
+                    SaveAction("Tweet", Status, result.Id, result.User.ScreenName);
+                    return true;
+                }
+                else
+                    return false;
+            }
+            catch (Exception ex)
+            {
+                log.Error("No se pudo enviar el Tweet", ex);
+                return false;
+            }
+        }
+
+        public void FavTweet(long tweetID, string tweet)
+        {
+            try
+            {
+                FavoriteTweetOptions fav = new FavoriteTweetOptions();
+                fav.Id = tweetID;
+                MvcApplication.service.FavoriteTweet(fav);
+                RateLimit(MvcApplication.service.Response.RateLimitStatus);
+                int counter = Convert.ToInt32(FavCounter);
+                if (MvcApplication.service.Response.StatusDescription == "OK")
+                {
+                    SaveAction("Favorite", tweet, tweetID, " ");
+                    counter++;
+                }
+                FavCounter = counter;
+                //getLog();
+            }
+            catch (Exception ex)
+            {
+                log.Error("No se pudo favear el Tweet", ex);
+            }
+        }
+
+        public void RTTweet(long tweetID, string tweet)
+        {
+            RetweetOptions rt = new RetweetOptions();
+            rt.Id = tweetID;
+            MvcApplication.service.Retweet(rt);
+            RateLimit(MvcApplication.service.Response.RateLimitStatus);
+            int counter = Convert.ToInt32(TweetCounter);
+            if (MvcApplication.service.Response.StatusDescription == "OK")
+            {
+                SaveAction("ReTweet", tweet, tweetID, " ");
+                counter++;
+            }
+            TweetCounter = counter;
+            //getLog();
+        }
+
+        public void Follow(bool following, string screenName)
+        {
+            FollowUserOptions follow = new FollowUserOptions();
+            follow.Follow = following;
+            follow.ScreenName = screenName;
+            MvcApplication.service.FollowUser(follow);
+            RateLimit(MvcApplication.service.Response.RateLimitStatus);
+            int counter = Convert.ToInt32(FollowCounter);
+            if (MvcApplication.service.Response.StatusDescription == "OK")
+            {
+                SaveAction(following ? "Follow" : "Unfollow", " ", 0, screenName);
+                counter++;
+            }
+            FollowCounter = counter;
+            //getLog();
+        }
+
+        public void Recommended()
+        {
+            ListFriendsOptions Friends = new ListFriendsOptions();
+            Friends.ScreenName = "nalgaprontacom";
+            Friends.Count = 500;
+            friendList = MvcApplication.service.ListFriends(Friends);
+            string status = "#MustFollow : ";
+            int contador = 0;
+            while (status.Length <= 88 && contador <= 6)
+            {
+                int index = rand.Next(0, friendList.Count);
+                //foreach (TwitterUser t in friendList)
+                //{
+                if (friendList.ElementAt(index).ScreenName.Length + status.Length <= 87)
+                {
+                    status += " @" + friendList.ElementAt(index).ScreenName + " ";
+                }
+                contador++;
+                friendList.RemoveAt(index);
+
+                //}
+            }
+            SendTweet(status);
+        }
+
+        public bool SendTweet(string status)
+        {
+            bool success = false;
+            if (fileEntries != null && fileEntries.Length > 0)
+            {
+                success = TweetWithMedia(status, fileEntries[0]);
+                var list = new List<string>(fileEntries);
+                list.Remove(fileEntries[0]);
+                fileEntries = list.ToArray();
+                NumFotos = fileEntries.Length;
+            }
+            else
+            {
+                success = Tweet(status);
+            }
+            if (success)
+            {
+                int tweetCounter = Convert.ToInt32(TweetCounter);
+                tweetCounter++;
+                TweetCounter = tweetCounter;
+            }
+            //getLog();
+            return success;
+        }
+
+        public bool TweetWithMedia(string status, string mediaPath)
+        {
+            try
+            {
+                TwitterStatus result;
+                SendTweetWithMediaOptions MediaOp = new SendTweetWithMediaOptions();
+                Bitmap img = new Bitmap(mediaPath); //Bitmap img = new Bitmap(@"C:\Users\AngelC\Dropbox\Freelance Ko\TweetBot\logo.jpg");
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    img.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    ms.Seek(0, SeekOrigin.Begin);
+                    Dictionary<string, Stream> images = new Dictionary<string, Stream> { { "mypicture", ms } };
+                    result = MvcApplication.service.SendTweetWithMedia(
+                        new SendTweetWithMediaOptions { Status = status, Images = images });
+                    ((IDisposable)img).Dispose();
+                }
+                RateLimit(MvcApplication.service.Response.RateLimitStatus);
+                if (result != null)
+                {
+                    SaveAction("Tweet", status, result.Id, result.User.ScreenName);
+                    string copyFilePath = tweetedPath + "\\" + Path.GetFileName(mediaPath);
+                    System.IO.File.Move(mediaPath, copyFilePath);
+                    return true;
+                }
+                Errors = MvcApplication.service.Response.StatusDescription + " " + MvcApplication.service.Response.Error;
+                return false;
+            }
+            catch (Exception ex)
+            {
+                log.Error("No se pudo lanzar el Tweet", ex);
+                return false;
+            }
+        }
+
+        public void SaveAction(string action, string text, long TweetId, string Username)
+        {
+            try
+            {
+                using (TweetBotDBEntities bd = new TweetBotDBEntities())
+                {
+                    Tweeted t = new Tweeted();
+                    t.Action = action;
+                    t.Text = text;
+                    t.Timestamp = DateTime.Now;
+                    t.TweetId = TweetId;
+                    t.Username = Username;
+                    bd.Tweeteds.Add(t);
+                    bd.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("No se pudo guardar la acción: " + action , ex);
+            }
+        }
+
+        public static int ProcessDirectory(string targetDirectory)
+        {
+            // Process the list of files found in the directory.
+            fileEntries = Directory.GetFiles(targetDirectory);
+            return fileEntries.Length;
+        }
+
+        public void ScanForMedia()
+        {
+            string exeFile = AppDomain.CurrentDomain.GetData("DataDirectory").ToString();
+            string exeDir = Path.GetDirectoryName(exeFile);
+            //string fullPath = Path.Combine(exeDir, "..\\..\\Images\\");
+            fullPath = Path.Combine(exeDir + "\\Images\\");
+            tweetedPath = Path.Combine(exeDir + "\\Images\\tweeted");
+            if (Directory.Exists(fullPath))
+            {
+                NumFotos = ProcessDirectory(fullPath);
+            }
+            if (!System.IO.Directory.Exists(tweetedPath))
+            {
+                System.IO.Directory.CreateDirectory(tweetedPath);
+            }
+
+        }
+
     }
 }
