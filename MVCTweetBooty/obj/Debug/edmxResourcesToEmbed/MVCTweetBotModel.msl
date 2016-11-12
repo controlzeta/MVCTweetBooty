@@ -68,5 +68,13 @@
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
+    <EntitySetMapping Name="SearchTerms">
+      <EntityTypeMapping TypeName="TweetBotDBModel.SearchTerm">
+        <MappingFragment StoreEntitySet="SearchTerms">
+          <ScalarProperty Name="SearchTerm1" ColumnName="SearchTerm" />
+          <ScalarProperty Name="id" ColumnName="id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
   </EntityContainerMapping>
 </Mapping>

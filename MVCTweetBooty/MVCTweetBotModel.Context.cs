@@ -31,5 +31,6 @@ namespace MVCTweetBooty
         public virtual DbSet<Tweeted> Tweeteds { get; set; }
         public virtual DbSet<Tweet> Tweets { get; set; }
         public virtual DbSet<Configuration> Configurations { get; set; }
+        public virtual DbSet<SearchTerm> SearchTerms { get; set; }
     }
 }

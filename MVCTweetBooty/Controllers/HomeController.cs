@@ -36,10 +36,18 @@ namespace MVCTweetBooty.Controllers
         public JsonResult Timer(int id)
         {
             HomeModels m = new HomeModels();
+            m.FifteenMinuteEvent();
             m.RandomTime();
             return Json(m.secondsLeft);
         }
 
+        [HttpPost]
+        public JsonResult OldTweets(int howMany)
+        {
+            HomeModels m = new HomeModels();
+            m.getOldTweets();
+            return Json(m.OldTweets);
+        }
 
         [HttpPost]
         public JsonResult SearchTweets(string query, string numberOfResults, string resultsType)
@@ -64,6 +72,7 @@ namespace MVCTweetBooty.Controllers
                 MaxJsonLength = 86753090
             };
         }
+
 
         public ActionResult About()
         {

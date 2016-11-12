@@ -51,6 +51,16 @@ advertencia 6002: La tabla o vista 'MVCTweetBot .dbo.Configuration' no tiene def
     <Property Name="sortOrder" Type="int" Nullable="false" />
     <Property Name="link" Type="nvarchar" MaxLength="255" Nullable="false" />
   </EntityType>
+  <!--Errores durante la generación:
+advertencia 6002: La tabla o vista 'MVCTweetBot .dbo.SearchTerms' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+  <EntityType Name="SearchTerms">
+    <Key>
+      <PropertyRef Name="id" />
+      <PropertyRef Name="SearchTerm" />
+    </Key>
+    <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="SearchTerm" Type="nvarchar" MaxLength="140" Nullable="false" />
+  </EntityType>
   <EntityType Name="Tweeted">
     <Key>
       <PropertyRef Name="Id" />
@@ -89,6 +99,12 @@ advertencia 6002: La tabla o vista 'MVCTweetBot .dbo.Configuration' no tiene def
     [Configuration].[FavLimit] AS [FavLimit], 
     [Configuration].[FollowLimit] AS [FollowLimit]
     FROM [dbo].[Configuration] AS [Configuration]</DefiningQuery>
+    </EntitySet>
+    <EntitySet Name="SearchTerms" EntityType="Self.SearchTerms" store:Type="Tables" store:Schema="dbo">
+      <DefiningQuery>SELECT 
+    [SearchTerms].[id] AS [id], 
+    [SearchTerms].[SearchTerm] AS [SearchTerm]
+    FROM [dbo].[SearchTerms] AS [SearchTerms]</DefiningQuery>
     </EntitySet>
   </EntityContainer>
 </Schema>

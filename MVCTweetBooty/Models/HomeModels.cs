@@ -49,6 +49,7 @@ namespace MVCTweetBooty.Models
         public List<TwitterHashTag> hashtagsDistintos = new List<TwitterHashTag>();
         public List<TwitterUser> friendList = new List<TwitterUser>();
         public List<TwitterTrend> TrendList = new List<TwitterTrend>();
+        public List<Tweeted> OldTweets = new List<Tweeted>();
         public int CountryId { get; set; }
         public List<SelectListItem> Countries { get; set; }
         public List<SelectListItem> ResultsNumber { get; set; }
@@ -81,6 +82,7 @@ namespace MVCTweetBooty.Models
             InitializeSelects();
             RateLimit(MvcApplication.service.Response.RateLimitStatus);
             RandomTime();
+            //GetBestTweets();
         }
 
         public void InitializeSelects()
@@ -114,6 +116,62 @@ namespace MVCTweetBooty.Models
         {
             rateLimit = "You have used " + rate.RemainingHits + " out of your " + rate.HourlyLimit + " \n";
             rateLimit += "You have to wait: " + rate.ResetTimeInSeconds / 60 + " minutes or to " + rate.ResetTime.ToLongTimeString();
+        }
+
+        public void FifteenMinuteEvent()
+        {
+            try
+            {
+                // Create Random number 
+                int times = rand.Next(1, 5);
+                bool AlreadyRecommended = false;
+                while (times > 0)
+                {
+                    int action = rand.Next(1, 6);
+                    switch (action)
+                    {
+                        case 1: //Tweet
+                            string nuevoStatus = ConstructTweet(85);
+                            SendTweet(nuevoStatus);
+                            break;
+                        case 2: //Fav
+                            var statuses = GetBestTweets();
+                            if (statuses.Count > 0)
+                            {
+                                FavTweet(statuses.ElementAt(0).Id, statuses.ElementAt(0).Text);
+                            }
+                            break;
+                        case 3: //RT
+                            var statuses2 = GetBestTweets();
+                            if (statuses2.Count > 0)
+                            {
+                                RTTweet(statuses2.ElementAt(0).Id, statuses2.ElementAt(0).Text);
+                            }
+                            break;
+                        case 4: //RT & FAV
+                            var statuses3 = GetBestTweets();
+                            if (statuses3.Count > 0)
+                            {
+                                FavTweet(statuses3.ElementAt(0).Id, statuses3.ElementAt(0).Text);
+                                RTTweet(statuses3.ElementAt(0).Id, statuses3.ElementAt(0).Text);
+                            }
+                            break;
+                        //case 5: //Recommend
+                        //    if (!AlreadyRecommended)
+                        //    {
+                        //        Recommended();
+                        //        AlreadyRecommended = true;
+                        //    }
+                        //    break;
+                    }
+                    times--;
+                }
+                RandomTime();
+            }
+            catch (Exception ex)
+            {
+                log.Error("No se pudo inicializar el proceso de Timer: " , ex);
+            }
         }
 
         private TwitterSearchResult Search(string query, int numberOfResults, int resultType)
@@ -158,14 +216,27 @@ namespace MVCTweetBooty.Models
         public List<TwitterStatus> GetBestTweets()
         {
             List<TwitterStatus> statuses = new List<TwitterStatus>();
-            TwitterSearchResult tweets = Search("putas pic", 0, 0);
+            TwitterSearchResult tweets = Search(GetSearchTerm(), 0, 0);
             if (tweets != null)
             {
                 statuses = (from x in tweets.Statuses
-                            orderby x.RetweetCount
+                            orderby x.RetweetCount descending
                             select x).ToList();
+
             }
             return statuses;
+        }
+
+        public string GetSearchTerm()
+        {
+            using (TweetBotDBEntities bd = new TweetBotDBEntities())
+            {
+                Random rnd = new Random();
+                List<SearchTerm> lsST =  (from li in bd.SearchTerms
+                                select li).ToList();
+                return lsST.ElementAt(rnd.Next(0, lsST.Count)).SearchTerm1;
+            }
+            
         }
 
         public void GetCountries()
@@ -208,9 +279,59 @@ namespace MVCTweetBooty.Models
 
         public int RandomTime()
         {
-            minutesLeft = rand.Next(1, 5);
+            minutesLeft = rand.Next(50, 75);
             secondsLeft = minutesLeft * 60;
             return secondsLeft;
+        }
+
+        public string ConstructTweet(int tweetLength)
+        {
+            Random rnd = new Random();
+            string nuevoStatus = "";
+            using (TweetBotDBEntities bd = new TweetBotDBEntities())
+            {
+                int NumLinks = (from li in bd.Links
+                                select li).ToList().Count;
+                int random = rnd.Next(1, NumLinks);
+                Link link = (from l in bd.Links
+                             where l.id == random
+                             select l).FirstOrDefault();
+                nuevoStatus = ShortenedString(link.title, tweetLength);
+                int counter = 0;
+                while (nuevoStatus.Length <= tweetLength)
+                {
+                    List<Hashtag> lsthashtags = (from h in bd.Hashtags
+                                                 where h.repeated > 80
+                                                 select h).ToList();
+                    random = rnd.Next(0, lsthashtags.Count);
+                    if ((nuevoStatus.Length + lsthashtags.ElementAt(random).hashtag1.Trim().Length + 2) < tweetLength)
+                    {
+                        nuevoStatus = nuevoStatus + " #" + lsthashtags.ElementAt(random).hashtag1.Trim();
+                    }
+                    else
+                    {
+                        counter++;
+                    }
+                    if (counter == 5)
+                    {
+                        break;
+                    }
+                }
+                nuevoStatus = ShortenedString(nuevoStatus, tweetLength) + " " + link.link1;
+            }
+            return nuevoStatus;
+        }
+
+        private string ShortenedString(string linea, int medida)
+        {
+            if (linea.Length <= medida)
+            {
+                return linea;
+            }
+            string lineaCorta;
+            int cuantos = linea.Length - medida;
+            lineaCorta = linea.Remove(medida, cuantos);
+            return lineaCorta;
         }
 
         public bool Tweet(string Status)
@@ -373,6 +494,37 @@ namespace MVCTweetBooty.Models
             {
                 log.Error("No se pudo lanzar el Tweet", ex);
                 return false;
+            }
+        }
+
+        public void GetMentions()
+        {
+            List<TwitterStatus> mentions = MvcApplication.service.ListTweetsMentioningMe(new ListTweetsMentioningMeOptions()).ToList();
+            foreach (TwitterStatus t in mentions)
+            {
+                //DataGridViewRow row = (DataGridViewRow)dgvMentions.Rows[0].Clone();
+                //row.Cells[0].Value = t.Author.ScreenName;                   //UserName
+                //row.Cells[1].Value = t.Text;                                //Text
+                //row.Cells[2].Value = t.Id.ToString();                         //Id
+                //dgvMentions.Rows.Add(row);
+            }
+            RateLimit(MvcApplication.service.Response.RateLimitStatus);
+        }
+
+        public void getOldTweets(int howMany = 50)
+        {
+            try
+            {
+                using (TweetBotDBEntities bd = new TweetBotDBEntities())
+                {
+                    OldTweets = (from o in bd.Tweeteds
+                                     orderby o.Id descending
+                                 select o).Take(howMany).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("No se pudo enviar el Tweet", ex);
             }
         }
 

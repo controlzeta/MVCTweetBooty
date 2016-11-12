@@ -7,6 +7,7 @@
     <EntitySet Name="Tweeteds" EntityType="TweetBotDBModel.Tweeted" />
     <EntitySet Name="Tweets" EntityType="TweetBotDBModel.Tweet" />
     <EntitySet Name="Configurations" EntityType="TweetBotDBModel.Configuration" />
+    <EntitySet Name="SearchTerms" EntityType="TweetBotDBModel.SearchTerm" />
   </EntityContainer>
   <EntityType Name="BannedWord">
     <Key>
@@ -76,5 +77,13 @@
     <Property Name="TweetLimit" Type="Int32" Nullable="false" />
     <Property Name="FavLimit" Type="Int32" Nullable="false" />
     <Property Name="FollowLimit" Type="Int32" Nullable="false" />
+  </EntityType>
+  <EntityType Name="SearchTerm">
+    <Key>
+      <PropertyRef Name="id" />
+      <PropertyRef Name="SearchTerm1" />
+    </Key>
+    <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="SearchTerm1" Type="String" Nullable="false" MaxLength="140" FixedLength="false" Unicode="true" />
   </EntityType>
 </Schema>

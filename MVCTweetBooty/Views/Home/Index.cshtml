@@ -7,7 +7,7 @@
         <div class="panel panel-default">
             <div class="panel-body">
                 <div class="col-md-6">
-                    <p>@Model.rateLimit</p>
+                    <span id="rateLimit">@Model.rateLimit</span>
                 </div>
                 <div class="col-md-6">
                     <div class="col-md-6 bolder text-center">
@@ -15,8 +15,9 @@
                         <span id="minutes">00</span>:<span id="seconds">00</span>
                     </div>
                     <div class="col-md-6 bolder text-center">
-                        <span id="minutes">
-                            @Model.NumFotos</span> Photos<br />
+                        <span id="NumFotos">
+                            @Model.NumFotos
+                        </span> Photos<br />
                         <a class="btn btn-default"> Reload Photos</a>
 </div>
                 </div>
@@ -59,7 +60,7 @@
     <li role="presentation" class="active"><a data-toggle="tab" href="#tweetExplorer">Tweet Explorer</a></li>
     <li role="presentation"><a data-toggle="tab" href="#hashtagExplorer">Hashtag Explorer</a></li>
     <li role="presentation"><a data-toggle="tab" href="#tweetMentions">Tweet Mentions</a></li>
-    <li role="presentation"><a data-toggle="tab" href="#messages">Tweet Something</a></li>
+    <li role="presentation"><a data-toggle="tab" onclick="GetOldTweets();" href="#messages">Tweet Something</a></li>
 </ul>
 <div class="row">
     <div class="tab-content">
@@ -205,17 +206,19 @@
                         </div>
                         <div class="row">
                             <div class="col-md-12">
-                                <table id="TweetsDT" style="width:100%" class="table-responsive table-bordered">
+                                <table id="OldTweetsDT" style="width:100%" class="table-responsive table-bordered">
                                     <thead>
                                         <tr>
-                                            <th>ID</th>
-                                            <th>Username</th>
+                                            <th>Action</th>
+                                            <th>Text</th>
+                                            <th>Date</th>
                                             <th>Tweet</th>
-                                            <th>RT's</th>
+                                            <th>Username</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
+                                            <td>-</td>
                                             <td>-</td>
                                             <td>-</td>
                                             <td>-</td>
@@ -273,6 +276,50 @@
             data: "{ tweetText: '" + $('#TweetText').val() + "' }",
             success: function (data) {
                 console.log(data);
+                RefreshLabels(data);
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                console.log(xhr.error);
+                console.log(thrownError);
+                console.log(ajaxOptions);
+            }
+        }); // end ajax call
+    }
+
+    function GetOldTweets() {
+        $.ajax({
+            //cache: false,
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            url: "/Home/OldTweets",
+            data: "{ howMany: 0 }",
+            success: function (data) {
+                console.log(data);
+                RefreshLabels(data);
+                $('#OldTweetsDT').DataTable({
+                    "sDom": '<"top"lf>rt<"bottom"p><"clear">',
+                    "lengthMenu": [[25, 35, 50, -1], [25, 35, 50, "All"]],
+                    "destroy": true,
+                    "data": data,
+                    "columns": [
+                        {
+                            "data": "Action"
+                        },
+                        {
+                            "data": "Text"
+                        },
+                        {
+                            "data": "Timestamp"
+                        },
+                        {
+                            "data": "TweetId"
+                        },
+                        {
+                            "data": "Username"
+                        }
+                    ]
+                });
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 console.log(xhr.error);
@@ -393,11 +440,11 @@
             } else {
                 console.log('Tweeting');
                 $.ajax({
-                    //cache: false,
                     type: "POST",
                     contentType: "application/json; charset=utf-8",
                     dataType: 'json',
                     url: "/Home/Timer",
+                    async: false,
                     data: "{ id: 0 }",
                     success: function (data) {
                         console.log(data);
@@ -407,7 +454,7 @@
                         console.log(xhr.error);
                         console.log(thrownError);
                         console.log(ajaxOptions);
-                        alert("Ajax Failed!!!");
+                        //alert("Ajax Failed!!!");
                     }
                 }); // end ajax call
             }
@@ -429,6 +476,19 @@
             }
         });
     });
+
+    function RefreshLabels(data) {
+        try {
+            $('#TweetCounter').text(data.TweetCounter);
+            $('#FavCounter').text(data.FavCounter);
+            $('#FollowCounter').text(data.FollowCounter);
+            $('#NumFotos').text(data.NumFotos);
+            $('#rateLimit').text(data.rateLimit);
+        }
+        catch (e) {
+            console.log(e);
+        }
+    }
 </script>
 
 

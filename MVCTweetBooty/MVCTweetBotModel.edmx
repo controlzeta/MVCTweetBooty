@@ -56,6 +56,16 @@ advertencia 6002: La tabla o vista 'MVCTweetBot .dbo.Configuration' no tiene def
           <Property Name="sortOrder" Type="int" Nullable="false" />
           <Property Name="link" Type="nvarchar" MaxLength="255" Nullable="false" />
         </EntityType>
+        <!--Errores durante la generación:
+advertencia 6002: La tabla o vista 'MVCTweetBot .dbo.SearchTerms' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+        <EntityType Name="SearchTerms">
+          <Key>
+            <PropertyRef Name="id" />
+            <PropertyRef Name="SearchTerm" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SearchTerm" Type="nvarchar" MaxLength="140" Nullable="false" />
+        </EntityType>
         <EntityType Name="Tweeted">
           <Key>
             <PropertyRef Name="Id" />
@@ -95,6 +105,12 @@ advertencia 6002: La tabla o vista 'MVCTweetBot .dbo.Configuration' no tiene def
     [Configuration].[FollowLimit] AS [FollowLimit]
     FROM [dbo].[Configuration] AS [Configuration]</DefiningQuery>
           </EntitySet>
+          <EntitySet Name="SearchTerms" EntityType="Self.SearchTerms" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [SearchTerms].[id] AS [id], 
+    [SearchTerms].[SearchTerm] AS [SearchTerm]
+    FROM [dbo].[SearchTerms] AS [SearchTerms]</DefiningQuery>
+          </EntitySet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
@@ -107,6 +123,7 @@ advertencia 6002: La tabla o vista 'MVCTweetBot .dbo.Configuration' no tiene def
           <EntitySet Name="Tweeteds" EntityType="TweetBotDBModel.Tweeted" />
           <EntitySet Name="Tweets" EntityType="TweetBotDBModel.Tweet" />
           <EntitySet Name="Configurations" EntityType="TweetBotDBModel.Configuration" />
+          <EntitySet Name="SearchTerms" EntityType="TweetBotDBModel.SearchTerm" />
         </EntityContainer>
         <EntityType Name="BannedWord">
           <Key>
@@ -176,6 +193,14 @@ advertencia 6002: La tabla o vista 'MVCTweetBot .dbo.Configuration' no tiene def
           <Property Name="TweetLimit" Type="Int32" Nullable="false" />
           <Property Name="FavLimit" Type="Int32" Nullable="false" />
           <Property Name="FollowLimit" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="SearchTerm">
+          <Key>
+            <PropertyRef Name="id" />
+            <PropertyRef Name="SearchTerm1" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SearchTerm1" Type="String" Nullable="false" MaxLength="140" FixedLength="false" Unicode="true" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -247,6 +272,14 @@ advertencia 6002: La tabla o vista 'MVCTweetBot .dbo.Configuration' no tiene def
                 <ScalarProperty Name="AccessToken" ColumnName="AccessToken" />
                 <ScalarProperty Name="ConsumerSecret" ColumnName="ConsumerSecret" />
                 <ScalarProperty Name="ConsumerKey" ColumnName="ConsumerKey" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SearchTerms">
+            <EntityTypeMapping TypeName="TweetBotDBModel.SearchTerm">
+              <MappingFragment StoreEntitySet="SearchTerms">
+                <ScalarProperty Name="SearchTerm1" ColumnName="SearchTerm" />
+                <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
