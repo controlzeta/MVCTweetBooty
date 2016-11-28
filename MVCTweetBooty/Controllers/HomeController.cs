@@ -73,7 +73,42 @@ namespace MVCTweetBooty.Controllers
             };
         }
 
+        [HttpPost]
+        public JsonResult ReTweetSomething()
+        {
+            HomeModels m = new HomeModels();
+            m.ReTweetSomething();
+            return new JsonResult()
+            {
+                Data = m,
+                MaxJsonLength = 86753090
+            };
+        }
 
+        [HttpPost]
+        public JsonResult FavoriteSomething()
+        {
+            HomeModels m = new HomeModels();
+            m.FavoriteSomething();
+            return new JsonResult()
+            {
+                Data = m,
+                MaxJsonLength = 86753090
+            };
+        }
+
+        [HttpPost]
+        public JsonResult GetMentions()
+        {
+            HomeModels m = new HomeModels();
+            m.GetMentions();
+            return new JsonResult()
+            {
+                Data = m,
+                MaxJsonLength = 86753090
+            };
+        }
+        
         public ActionResult About()
         {
             ViewBag.Message = "Your app description page.";

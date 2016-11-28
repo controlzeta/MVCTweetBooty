@@ -204,3 +204,5 @@ F:\Documents\GitHub\MVCTweetBooty\MVCTweetBooty\obj\Debug\MVCTweetBooty.pdb
 F:\Documents\GitHub\MVCTweetBooty\MVCTweetBooty\obj\Debug\MVCTweetBooty.csprojResolveAssemblyReference.cache
 E:\Documents\GitHub\MVCTweetBooty\MVCTweetBooty\bin\log4net.dll
 E:\Documents\GitHub\MVCTweetBooty\MVCTweetBooty\bin\log4net.xml
+F:\Documents\GitHub\MVCTweetBooty\MVCTweetBooty\bin\log4net.dll
+F:\Documents\GitHub\MVCTweetBooty\MVCTweetBooty\bin\log4net.xml

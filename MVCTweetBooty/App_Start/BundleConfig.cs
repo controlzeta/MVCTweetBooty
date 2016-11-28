@@ -29,6 +29,7 @@ namespace MVCTweetBooty
             bundles.Add(new StyleBundle("~/Content/css").Include(
                         "~/Content/bootstrap.css",
                         "~/Content/jquery.dataTables.css",
+                        "~/Content/font-awesome.css",
                         "~/Content/dataTables.bootstrap.css"));
 
             bundles.Add(new StyleBundle("~/Content/themes/base/css").Include(

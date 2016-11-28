@@ -50,16 +50,15 @@ namespace MVCTweetBooty.Models
         public List<TwitterUser> friendList = new List<TwitterUser>();
         public List<TwitterTrend> TrendList = new List<TwitterTrend>();
         public List<Tweeted> OldTweets = new List<Tweeted>();
+        public List<TwitterStatus> mentions = new List<TwitterStatus>();
+        public List<SelectListItem> ResultsNumber = new List<SelectListItem>();
+        public int idResultNumber { get; set; }
         public int CountryId { get; set; }
         public List<SelectListItem> Countries { get; set; }
-        public List<SelectListItem> ResultsNumber { get; set; }
-        public int idResultNumber { get; set; }
         public List<SelectListItem> TypeOfResults { get; set; }
         public int idTypeOfResults;
-
         public TwitterSearchResult results = new TwitterSearchResult();
         public string Statuses = "";
-
         public string rateLimit = "";
 
         public HomeModels()
@@ -279,7 +278,7 @@ namespace MVCTweetBooty.Models
 
         public int RandomTime()
         {
-            minutesLeft = rand.Next(50, 75);
+            minutesLeft = rand.Next(90, 120);
             secondsLeft = minutesLeft * 60;
             return secondsLeft;
         }
@@ -354,6 +353,38 @@ namespace MVCTweetBooty.Models
             {
                 log.Error("No se pudo enviar el Tweet", ex);
                 return false;
+            }
+        }
+
+        public void ReTweetSomething()
+        {
+            try
+            {
+                var statuses = GetBestTweets();
+                if (statuses.Count > 0)
+                {
+                    RTTweet(statuses.ElementAt(0).Id, statuses.ElementAt(0).Text);
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("No se pudo Retwitear el Tweet", ex);
+            }
+        }
+
+        public void FavoriteSomething()
+        {
+            try
+            {
+                var statuses = GetBestTweets();
+                if (statuses.Count > 0)
+                {
+                    FavTweet(statuses.ElementAt(0).Id, statuses.ElementAt(0).Text);
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("No se pudo Retwitear el Tweet", ex);
             }
         }
 
@@ -499,16 +530,23 @@ namespace MVCTweetBooty.Models
 
         public void GetMentions()
         {
-            List<TwitterStatus> mentions = MvcApplication.service.ListTweetsMentioningMe(new ListTweetsMentioningMeOptions()).ToList();
-            foreach (TwitterStatus t in mentions)
+            try
             {
-                //DataGridViewRow row = (DataGridViewRow)dgvMentions.Rows[0].Clone();
-                //row.Cells[0].Value = t.Author.ScreenName;                   //UserName
-                //row.Cells[1].Value = t.Text;                                //Text
-                //row.Cells[2].Value = t.Id.ToString();                         //Id
-                //dgvMentions.Rows.Add(row);
+                mentions = MvcApplication.service.ListTweetsMentioningMe(new ListTweetsMentioningMeOptions()).ToList();
+                RateLimit(MvcApplication.service.Response.RateLimitStatus);
             }
-            RateLimit(MvcApplication.service.Response.RateLimitStatus);
+            catch (Exception ex)
+            {
+                log.Error("No se pudieron mostrar las menciones: ", ex);
+            }
+            //foreach (TwitterStatus t in mentions)
+            //{
+            //    //DataGridViewRow row = (DataGridViewRow)dgvMentions.Rows[0].Clone();
+            //    //row.Cells[0].Value = t.Author.ScreenName;                   //UserName
+            //    //row.Cells[1].Value = t.Text;                                //Text
+            //    //row.Cells[2].Value = t.Id.ToString();                         //Id
+            //    //dgvMentions.Rows.Add(row);
+            //}
         }
 
         public void getOldTweets(int howMany = 50)
