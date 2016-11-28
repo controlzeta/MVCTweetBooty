@@ -59,7 +59,7 @@
 <ul class="nav nav-tabs">
     <li role="presentation" class="active"><a data-toggle="tab" href="#tweetExplorer">Tweet Explorer</a></li>
     <li role="presentation"><a data-toggle="tab" href="#hashtagExplorer">Hashtag Explorer</a></li>
-    <li role="presentation"><a data-toggle="tab" href="#tweetMentions">Tweet Mentions</a></li>
+    <li role="presentation"><a data-toggle="tab" href="#tweetMentions" onclick="GetMentions();">Tweet Mentions</a></li>
     <li role="presentation"><a data-toggle="tab" onclick="GetOldTweets();" href="#messages">Tweet Something</a></li>
 </ul>
 <div class="row">
@@ -148,27 +148,29 @@
             <div style="min-height: 450px; padding-top: 15px;">
                 <div class="col-lg-12">
                     <div class="col-md-8">
-                        <table id="MentionsDT" style="width:100%" class="table-responsive table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Username</th>
-                                    <th>Tweet</th>
-                                    <th>RT's</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>-</td>
-                                    <td>-</td>
-                                    <td>-</td>
-                                    <td>-</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="col-md-12">
+                            <table id="MentionsDT" class="table-responsive table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Author</th>
+                                        <th>Tweet</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <div class="col-md-4">
-                        <table id="MentionsHashtag" style="width:100%" class="table-responsive table-bordered">
+                        <table id="MentionsHashtag" class="table-responsive table-bordered">
                             <thead>
                                 <tr>
                                     <th>ID</th>

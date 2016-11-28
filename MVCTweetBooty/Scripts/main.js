@@ -274,6 +274,45 @@ function GetMentions() {
         url: "/Home/GetMentions",
         success: function (data) {
             console.log(data.mentions);
+            var root = "https://twitter.com/";
+            $('#MentionsDT').DataTable({
+                "sDom": '<"top"lf>rt<"bottom"p><"clear">',
+                "lengthMenu": [[25, 35, 50, -1], [25, 35, 50, "All"]],
+                "destroy": true,
+                "data": data.mentions,
+                "columns": [
+                    {
+                        "data": "IdStr" // TweetId
+                    },
+                    {
+                        "data": "Author.ScreenName"  //Author
+                    },
+                    {
+                        "data": "TextAsHtml"  //Tweet
+                    },
+                    {
+                        "data": "CreatedDate"   //Date
+                    }
+                ],
+                "columnDefs": [
+                    {
+                        "title": "Id",
+                        "targets": 0,
+                        "render": function (data, type, row) {
+                            return '<a href="' + root + row["Author"].ScreenName + "/status/" + row["IdStr"] + '" target="_blank"> ' + data + '</a>';
+
+                        }
+                    },
+                     {
+                         "title": "Id",
+                         "targets": 1,
+                         "render": function (data, type, row) {
+                             return '<a href="' + root + row["Author"].ScreenName + '" target="_blank"> @' + data + '</a>';
+
+                         }
+                     }
+                ]
+            });
             RefreshLabels(data);
         },
         error: function (xhr, ajaxOptions, thrownError) {
