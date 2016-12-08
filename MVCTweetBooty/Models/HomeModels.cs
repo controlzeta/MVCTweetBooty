@@ -278,7 +278,7 @@ namespace MVCTweetBooty.Models
 
         public int RandomTime()
         {
-            minutesLeft = rand.Next(90, 120);
+            minutesLeft = rand.Next(120, 180);
             secondsLeft = minutesLeft * 60;
             return secondsLeft;
         }
