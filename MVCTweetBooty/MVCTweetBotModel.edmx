@@ -1,0 +1,291 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="TweetBotDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="BannedWords">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="bannedWord" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="timestamp" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Configuration">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ConsumerKey" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="ConsumerSecret" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="AccessToken" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="AccessTokenSecret" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Minutes" Type="int" Nullable="false" />
+          <Property Name="RTCount" Type="int" Nullable="false" />
+          <Property Name="TweetLimit" Type="int" Nullable="false" />
+          <Property Name="FavLimit" Type="int" Nullable="false" />
+          <Property Name="FollowLimit" Type="int" Nullable="false" />
+          <Property Name="TweetCounter" Type="int" Nullable="false" />
+          <Property Name="FavCounter" Type="int" Nullable="false" />
+          <Property Name="FollowCounter" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Hashtags">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="hashtag" Type="nchar" MaxLength="50" Nullable="false" />
+          <Property Name="timestamp" Type="datetime" Nullable="false" />
+          <Property Name="repeated" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Links">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="title" Type="nvarchar" MaxLength="140" Nullable="false" />
+          <Property Name="description" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="sortOrder" Type="int" Nullable="false" />
+          <Property Name="link" Type="nvarchar" MaxLength="255" Nullable="false" />
+        </EntityType>
+        <!--Errores durante la generación:
+advertencia 6002: La tabla o vista 'MVCTweetBot.dbo.SearchTerms' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+        <EntityType Name="SearchTerms">
+          <Key>
+            <PropertyRef Name="id" />
+            <PropertyRef Name="SearchTerm" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SearchTerm" Type="nvarchar" MaxLength="140" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Tweeted">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Text" Type="nvarchar" MaxLength="250" Nullable="false" />
+          <Property Name="Timestamp" Type="datetime" Nullable="false" />
+          <Property Name="Action" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Username" Type="nvarchar" MaxLength="50" />
+          <Property Name="TweetId" Type="float" />
+        </EntityType>
+        <EntityType Name="Tweets">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="tweet" Type="nvarchar" MaxLength="140" Nullable="false" />
+          <Property Name="timestamp" Type="datetime" Nullable="false" />
+          <Property Name="tweeted" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityContainer Name="TweetBotDBModelStoreContainer">
+          <EntitySet Name="BannedWords" EntityType="Self.BannedWords" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Configuration" EntityType="Self.Configuration" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Hashtags" EntityType="Self.Hashtags" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Links" EntityType="Self.Links" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Tweeted" EntityType="Self.Tweeted" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Tweets" EntityType="Self.Tweets" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SearchTerms" EntityType="Self.SearchTerms" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [SearchTerms].[id] AS [id], 
+    [SearchTerms].[SearchTerm] AS [SearchTerm]
+    FROM [dbo].[SearchTerms] AS [SearchTerms]</DefiningQuery>
+          </EntitySet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="TweetBotDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="TweetBotDBEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="BannedWords" EntityType="TweetBotDBModel.BannedWord" />
+          <EntitySet Name="Configurations" EntityType="TweetBotDBModel.Configuration" />
+          <EntitySet Name="Hashtags" EntityType="TweetBotDBModel.Hashtag" />
+          <EntitySet Name="Links" EntityType="TweetBotDBModel.Link" />
+          <EntitySet Name="Tweeteds" EntityType="TweetBotDBModel.Tweeted" />
+          <EntitySet Name="Tweets" EntityType="TweetBotDBModel.Tweet" />
+          <EntitySet Name="SearchTerms" EntityType="TweetBotDBModel.SearchTerm" />
+        </EntityContainer>
+        <EntityType Name="BannedWord">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="bannedWord1" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="timestamp" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="Configuration">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ConsumerKey" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="ConsumerSecret" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="AccessToken" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="AccessTokenSecret" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Minutes" Type="Int32" Nullable="false" />
+          <Property Name="RTCount" Type="Int32" Nullable="false" />
+          <Property Name="TweetLimit" Type="Int32" Nullable="false" />
+          <Property Name="FavLimit" Type="Int32" Nullable="false" />
+          <Property Name="FollowLimit" Type="Int32" Nullable="false" />
+          <Property Name="TweetCounter" Type="Int32" Nullable="false" />
+          <Property Name="FavCounter" Type="Int32" Nullable="false" />
+          <Property Name="FollowCounter" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Hashtag">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="hashtag1" Type="String" Nullable="false" MaxLength="50" FixedLength="true" Unicode="true" />
+          <Property Name="timestamp" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="repeated" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Link">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="title" Type="String" Nullable="false" MaxLength="140" FixedLength="false" Unicode="true" />
+          <Property Name="description" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="sortOrder" Type="Int32" Nullable="false" />
+          <Property Name="link1" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="Tweeted">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Text" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="Timestamp" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Action" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Username" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="TweetId" Type="Double" />
+        </EntityType>
+        <EntityType Name="Tweet">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="tweet1" Type="String" Nullable="false" MaxLength="140" FixedLength="false" Unicode="true" />
+          <Property Name="timestamp" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="tweeted" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="SearchTerm">
+          <Key>
+            <PropertyRef Name="id" />
+            <PropertyRef Name="SearchTerm1" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SearchTerm1" Type="String" Nullable="false" MaxLength="140" FixedLength="false" Unicode="true" />
+        </EntityType>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="TweetBotDBModelStoreContainer" CdmEntityContainer="TweetBotDBEntities">
+          <EntitySetMapping Name="BannedWords">
+            <EntityTypeMapping TypeName="TweetBotDBModel.BannedWord">
+              <MappingFragment StoreEntitySet="BannedWords">
+                <ScalarProperty Name="timestamp" ColumnName="timestamp" />
+                <ScalarProperty Name="bannedWord1" ColumnName="bannedWord" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Configurations">
+            <EntityTypeMapping TypeName="TweetBotDBModel.Configuration">
+              <MappingFragment StoreEntitySet="Configuration">
+                <ScalarProperty Name="FollowCounter" ColumnName="FollowCounter" />
+                <ScalarProperty Name="FavCounter" ColumnName="FavCounter" />
+                <ScalarProperty Name="TweetCounter" ColumnName="TweetCounter" />
+                <ScalarProperty Name="FollowLimit" ColumnName="FollowLimit" />
+                <ScalarProperty Name="FavLimit" ColumnName="FavLimit" />
+                <ScalarProperty Name="TweetLimit" ColumnName="TweetLimit" />
+                <ScalarProperty Name="RTCount" ColumnName="RTCount" />
+                <ScalarProperty Name="Minutes" ColumnName="Minutes" />
+                <ScalarProperty Name="AccessTokenSecret" ColumnName="AccessTokenSecret" />
+                <ScalarProperty Name="AccessToken" ColumnName="AccessToken" />
+                <ScalarProperty Name="ConsumerSecret" ColumnName="ConsumerSecret" />
+                <ScalarProperty Name="ConsumerKey" ColumnName="ConsumerKey" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Hashtags">
+            <EntityTypeMapping TypeName="TweetBotDBModel.Hashtag">
+              <MappingFragment StoreEntitySet="Hashtags">
+                <ScalarProperty Name="repeated" ColumnName="repeated" />
+                <ScalarProperty Name="timestamp" ColumnName="timestamp" />
+                <ScalarProperty Name="hashtag1" ColumnName="hashtag" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Links">
+            <EntityTypeMapping TypeName="TweetBotDBModel.Link">
+              <MappingFragment StoreEntitySet="Links">
+                <ScalarProperty Name="link1" ColumnName="link" />
+                <ScalarProperty Name="sortOrder" ColumnName="sortOrder" />
+                <ScalarProperty Name="description" ColumnName="description" />
+                <ScalarProperty Name="title" ColumnName="title" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Tweeteds">
+            <EntityTypeMapping TypeName="TweetBotDBModel.Tweeted">
+              <MappingFragment StoreEntitySet="Tweeted">
+                <ScalarProperty Name="TweetId" ColumnName="TweetId" />
+                <ScalarProperty Name="Username" ColumnName="Username" />
+                <ScalarProperty Name="Action" ColumnName="Action" />
+                <ScalarProperty Name="Timestamp" ColumnName="Timestamp" />
+                <ScalarProperty Name="Text" ColumnName="Text" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Tweets">
+            <EntityTypeMapping TypeName="TweetBotDBModel.Tweet">
+              <MappingFragment StoreEntitySet="Tweets">
+                <ScalarProperty Name="tweeted" ColumnName="tweeted" />
+                <ScalarProperty Name="timestamp" ColumnName="timestamp" />
+                <ScalarProperty Name="tweet1" ColumnName="tweet" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SearchTerms">
+            <EntityTypeMapping TypeName="TweetBotDBModel.SearchTerm">
+              <MappingFragment StoreEntitySet="SearchTerms">
+                <ScalarProperty Name="SearchTerm1" ColumnName="SearchTerm" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
