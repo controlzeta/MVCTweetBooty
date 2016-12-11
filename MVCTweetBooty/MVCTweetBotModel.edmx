@@ -13,20 +13,11 @@
           <Property Name="bannedWord" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="timestamp" Type="datetime" Nullable="false" />
         </EntityType>
-        <!--Errores durante la generación:
-advertencia 6002: La tabla o vista 'MVCTweetBot .dbo.Configuration' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
         <EntityType Name="Configuration">
           <Key>
-            <PropertyRef Name="ConsumerKey" />
-            <PropertyRef Name="ConsumerSecret" />
-            <PropertyRef Name="AccessToken" />
-            <PropertyRef Name="AccessTokenSecret" />
-            <PropertyRef Name="Minutes" />
-            <PropertyRef Name="RTCount" />
-            <PropertyRef Name="TweetLimit" />
-            <PropertyRef Name="FavLimit" />
-            <PropertyRef Name="FollowLimit" />
+            <PropertyRef Name="id" />
           </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="ConsumerKey" Type="nvarchar" MaxLength="255" Nullable="false" />
           <Property Name="ConsumerSecret" Type="nvarchar" MaxLength="255" Nullable="false" />
           <Property Name="AccessToken" Type="nvarchar" MaxLength="255" Nullable="false" />
@@ -36,6 +27,9 @@ advertencia 6002: La tabla o vista 'MVCTweetBot .dbo.Configuration' no tiene def
           <Property Name="TweetLimit" Type="int" Nullable="false" />
           <Property Name="FavLimit" Type="int" Nullable="false" />
           <Property Name="FollowLimit" Type="int" Nullable="false" />
+          <Property Name="TweetCounter" Type="int" Nullable="false" />
+          <Property Name="FavCounter" Type="int" Nullable="false" />
+          <Property Name="FollowCounter" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="Hashtags">
           <Key>
@@ -57,7 +51,7 @@ advertencia 6002: La tabla o vista 'MVCTweetBot .dbo.Configuration' no tiene def
           <Property Name="link" Type="nvarchar" MaxLength="255" Nullable="false" />
         </EntityType>
         <!--Errores durante la generación:
-advertencia 6002: La tabla o vista 'MVCTweetBot .dbo.SearchTerms' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+advertencia 6002: La tabla o vista 'MVCTweetBot.dbo.SearchTerms' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
         <EntityType Name="SearchTerms">
           <Key>
             <PropertyRef Name="id" />
@@ -88,23 +82,11 @@ advertencia 6002: La tabla o vista 'MVCTweetBot .dbo.SearchTerms' no tiene defin
         </EntityType>
         <EntityContainer Name="TweetBotDBModelStoreContainer">
           <EntitySet Name="BannedWords" EntityType="Self.BannedWords" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Configuration" EntityType="Self.Configuration" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Hashtags" EntityType="Self.Hashtags" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Links" EntityType="Self.Links" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Tweeted" EntityType="Self.Tweeted" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Tweets" EntityType="Self.Tweets" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Configuration" EntityType="Self.Configuration" store:Type="Tables" store:Schema="dbo">
-            <DefiningQuery>SELECT 
-    [Configuration].[ConsumerKey] AS [ConsumerKey], 
-    [Configuration].[ConsumerSecret] AS [ConsumerSecret], 
-    [Configuration].[AccessToken] AS [AccessToken], 
-    [Configuration].[AccessTokenSecret] AS [AccessTokenSecret], 
-    [Configuration].[Minutes] AS [Minutes], 
-    [Configuration].[RTCount] AS [RTCount], 
-    [Configuration].[TweetLimit] AS [TweetLimit], 
-    [Configuration].[FavLimit] AS [FavLimit], 
-    [Configuration].[FollowLimit] AS [FollowLimit]
-    FROM [dbo].[Configuration] AS [Configuration]</DefiningQuery>
-          </EntitySet>
           <EntitySet Name="SearchTerms" EntityType="Self.SearchTerms" store:Type="Tables" store:Schema="dbo">
             <DefiningQuery>SELECT 
     [SearchTerms].[id] AS [id], 
@@ -118,11 +100,11 @@ advertencia 6002: La tabla o vista 'MVCTweetBot .dbo.SearchTerms' no tiene defin
       <Schema Namespace="TweetBotDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityContainer Name="TweetBotDBEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="BannedWords" EntityType="TweetBotDBModel.BannedWord" />
+          <EntitySet Name="Configurations" EntityType="TweetBotDBModel.Configuration" />
           <EntitySet Name="Hashtags" EntityType="TweetBotDBModel.Hashtag" />
           <EntitySet Name="Links" EntityType="TweetBotDBModel.Link" />
           <EntitySet Name="Tweeteds" EntityType="TweetBotDBModel.Tweeted" />
           <EntitySet Name="Tweets" EntityType="TweetBotDBModel.Tweet" />
-          <EntitySet Name="Configurations" EntityType="TweetBotDBModel.Configuration" />
           <EntitySet Name="SearchTerms" EntityType="TweetBotDBModel.SearchTerm" />
         </EntityContainer>
         <EntityType Name="BannedWord">
@@ -132,6 +114,24 @@ advertencia 6002: La tabla o vista 'MVCTweetBot .dbo.SearchTerms' no tiene defin
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="bannedWord1" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="timestamp" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="Configuration">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ConsumerKey" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="ConsumerSecret" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="AccessToken" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="AccessTokenSecret" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Minutes" Type="Int32" Nullable="false" />
+          <Property Name="RTCount" Type="Int32" Nullable="false" />
+          <Property Name="TweetLimit" Type="Int32" Nullable="false" />
+          <Property Name="FavLimit" Type="Int32" Nullable="false" />
+          <Property Name="FollowLimit" Type="Int32" Nullable="false" />
+          <Property Name="TweetCounter" Type="Int32" Nullable="false" />
+          <Property Name="FavCounter" Type="Int32" Nullable="false" />
+          <Property Name="FollowCounter" Type="Int32" Nullable="false" />
         </EntityType>
         <EntityType Name="Hashtag">
           <Key>
@@ -172,28 +172,6 @@ advertencia 6002: La tabla o vista 'MVCTweetBot .dbo.SearchTerms' no tiene defin
           <Property Name="timestamp" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="tweeted" Type="Int32" Nullable="false" />
         </EntityType>
-        <EntityType Name="Configuration">
-          <Key>
-            <PropertyRef Name="ConsumerKey" />
-            <PropertyRef Name="ConsumerSecret" />
-            <PropertyRef Name="AccessToken" />
-            <PropertyRef Name="AccessTokenSecret" />
-            <PropertyRef Name="Minutes" />
-            <PropertyRef Name="RTCount" />
-            <PropertyRef Name="TweetLimit" />
-            <PropertyRef Name="FavLimit" />
-            <PropertyRef Name="FollowLimit" />
-          </Key>
-          <Property Name="ConsumerKey" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
-          <Property Name="ConsumerSecret" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
-          <Property Name="AccessToken" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
-          <Property Name="AccessTokenSecret" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
-          <Property Name="Minutes" Type="Int32" Nullable="false" />
-          <Property Name="RTCount" Type="Int32" Nullable="false" />
-          <Property Name="TweetLimit" Type="Int32" Nullable="false" />
-          <Property Name="FavLimit" Type="Int32" Nullable="false" />
-          <Property Name="FollowLimit" Type="Int32" Nullable="false" />
-        </EntityType>
         <EntityType Name="SearchTerm">
           <Key>
             <PropertyRef Name="id" />
@@ -202,7 +180,7 @@ advertencia 6002: La tabla o vista 'MVCTweetBot .dbo.SearchTerms' no tiene defin
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="SearchTerm1" Type="String" Nullable="false" MaxLength="140" FixedLength="false" Unicode="true" />
         </EntityType>
-      </Schema>
+        </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
@@ -213,6 +191,25 @@ advertencia 6002: La tabla o vista 'MVCTweetBot .dbo.SearchTerms' no tiene defin
               <MappingFragment StoreEntitySet="BannedWords">
                 <ScalarProperty Name="timestamp" ColumnName="timestamp" />
                 <ScalarProperty Name="bannedWord1" ColumnName="bannedWord" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Configurations">
+            <EntityTypeMapping TypeName="TweetBotDBModel.Configuration">
+              <MappingFragment StoreEntitySet="Configuration">
+                <ScalarProperty Name="FollowCounter" ColumnName="FollowCounter" />
+                <ScalarProperty Name="FavCounter" ColumnName="FavCounter" />
+                <ScalarProperty Name="TweetCounter" ColumnName="TweetCounter" />
+                <ScalarProperty Name="FollowLimit" ColumnName="FollowLimit" />
+                <ScalarProperty Name="FavLimit" ColumnName="FavLimit" />
+                <ScalarProperty Name="TweetLimit" ColumnName="TweetLimit" />
+                <ScalarProperty Name="RTCount" ColumnName="RTCount" />
+                <ScalarProperty Name="Minutes" ColumnName="Minutes" />
+                <ScalarProperty Name="AccessTokenSecret" ColumnName="AccessTokenSecret" />
+                <ScalarProperty Name="AccessToken" ColumnName="AccessToken" />
+                <ScalarProperty Name="ConsumerSecret" ColumnName="ConsumerSecret" />
+                <ScalarProperty Name="ConsumerKey" ColumnName="ConsumerKey" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -257,21 +254,6 @@ advertencia 6002: La tabla o vista 'MVCTweetBot .dbo.SearchTerms' no tiene defin
                 <ScalarProperty Name="timestamp" ColumnName="timestamp" />
                 <ScalarProperty Name="tweet1" ColumnName="tweet" />
                 <ScalarProperty Name="id" ColumnName="id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Configurations">
-            <EntityTypeMapping TypeName="TweetBotDBModel.Configuration">
-              <MappingFragment StoreEntitySet="Configuration">
-                <ScalarProperty Name="FollowLimit" ColumnName="FollowLimit" />
-                <ScalarProperty Name="FavLimit" ColumnName="FavLimit" />
-                <ScalarProperty Name="TweetLimit" ColumnName="TweetLimit" />
-                <ScalarProperty Name="RTCount" ColumnName="RTCount" />
-                <ScalarProperty Name="Minutes" ColumnName="Minutes" />
-                <ScalarProperty Name="AccessTokenSecret" ColumnName="AccessTokenSecret" />
-                <ScalarProperty Name="AccessToken" ColumnName="AccessToken" />
-                <ScalarProperty Name="ConsumerSecret" ColumnName="ConsumerSecret" />
-                <ScalarProperty Name="ConsumerKey" ColumnName="ConsumerKey" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

@@ -86,7 +86,7 @@ function Search() {
                         {
                             "data": "Author.ScreenName",
                             render: function (data, type, row) {
-                                return "<a href='https://twitter.com/" + row.Author.ScreenName + "' target='_blank'>@@" + row.Author.ScreenName + "</a>";
+                                return "<a href='https://twitter.com/" + row.Author.ScreenName + "' target='_blank'>@" + row.Author.ScreenName + "</a>";
                             }
                         },
                         { "data": "TextAsHtml" },

@@ -243,6 +243,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>MVCTweetBotModel.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Objects\Actions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SearchTerm.cs">
       <DependentUpon>MVCTweetBotModel.tt</DependentUpon>

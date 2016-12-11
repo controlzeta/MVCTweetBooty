@@ -14,6 +14,7 @@ namespace MVCTweetBooty
     
     public partial class Configuration
     {
+        public int id { get; set; }
         public string ConsumerKey { get; set; }
         public string ConsumerSecret { get; set; }
         public string AccessToken { get; set; }
@@ -23,5 +24,8 @@ namespace MVCTweetBooty
         public int TweetLimit { get; set; }
         public int FavLimit { get; set; }
         public int FollowLimit { get; set; }
+        public int TweetCounter { get; set; }
+        public int FavCounter { get; set; }
+        public int FollowCounter { get; set; }
     }
 }

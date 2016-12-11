@@ -4,14 +4,14 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="fd95e22bf10944a3aa158282e4633608" Name="Diagram1">
+      <Diagram DiagramId="fd95e22bf10944a3aa158282e4633608" Name="Diagram1" ZoomLevel="40">
         <EntityTypeShape EntityType="TweetBotDBModel.BannedWord" Width="1.5" PointX="0.75" PointY="0.75" />
-        <EntityTypeShape EntityType="TweetBotDBModel.Hashtag" Width="1.5" PointX="2.75" PointY="0.75" />
-        <EntityTypeShape EntityType="TweetBotDBModel.Link" Width="1.5" PointX="0.75" PointY="3.75" />
-        <EntityTypeShape EntityType="TweetBotDBModel.Tweeted" Width="1.5" PointX="2.75" PointY="3.75" />
-        <EntityTypeShape EntityType="TweetBotDBModel.Tweet" Width="1.5" PointX="4.75" PointY="0.75" />
-        <EntityTypeShape EntityType="TweetBotDBModel.Configuration" Width="1.5" PointX="4.75" PointY="3.75" />
-        <EntityTypeShape EntityType="TweetBotDBModel.SearchTerm" Width="1.5" PointX="0.75" PointY="6.75" />
+        <EntityTypeShape EntityType="TweetBotDBModel.Configuration" Width="1.5" PointX="2.75" PointY="0.75" />
+        <EntityTypeShape EntityType="TweetBotDBModel.Hashtag" Width="1.5" PointX="4.75" PointY="0.75" />
+        <EntityTypeShape EntityType="TweetBotDBModel.Link" Width="1.5" PointX="4.75" PointY="3.75" />
+        <EntityTypeShape EntityType="TweetBotDBModel.Tweeted" Width="1.5" PointX="0.75" PointY="5.75" />
+        <EntityTypeShape EntityType="TweetBotDBModel.Tweet" Width="1.5" PointX="6.75" PointY="0.75" />
+        <EntityTypeShape EntityType="TweetBotDBModel.SearchTerm" Width="1.5" PointX="2.75" PointY="6.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

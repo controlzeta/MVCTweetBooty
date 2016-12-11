@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="TweetBotDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="BannedWords">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="bannedWord" Type="nvarchar" MaxLength="50" Nullable="false" />
+    <Property Name="timestamp" Type="datetime" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Configuration">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ConsumerKey" Type="nvarchar" MaxLength="255" Nullable="false" />
+    <Property Name="ConsumerSecret" Type="nvarchar" MaxLength="255" Nullable="false" />
+    <Property Name="AccessToken" Type="nvarchar" MaxLength="255" Nullable="false" />
+    <Property Name="AccessTokenSecret" Type="nvarchar" MaxLength="255" Nullable="false" />
+    <Property Name="Minutes" Type="int" Nullable="false" />
+    <Property Name="RTCount" Type="int" Nullable="false" />
+    <Property Name="TweetLimit" Type="int" Nullable="false" />
+    <Property Name="FavLimit" Type="int" Nullable="false" />
+    <Property Name="FollowLimit" Type="int" Nullable="false" />
+    <Property Name="TweetCounter" Type="int" Nullable="false" />
+    <Property Name="FavCounter" Type="int" Nullable="false" />
+    <Property Name="FollowCounter" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Hashtags">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="hashtag" Type="nchar" MaxLength="50" Nullable="false" />
+    <Property Name="timestamp" Type="datetime" Nullable="false" />
+    <Property Name="repeated" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Links">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="title" Type="nvarchar" MaxLength="140" Nullable="false" />
+    <Property Name="description" Type="nvarchar" MaxLength="500" Nullable="false" />
+    <Property Name="sortOrder" Type="int" Nullable="false" />
+    <Property Name="link" Type="nvarchar" MaxLength="255" Nullable="false" />
+  </EntityType>
+  <!--Errores durante la generación:
+advertencia 6002: La tabla o vista 'MVCTweetBot.dbo.SearchTerms' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+  <EntityType Name="SearchTerms">
+    <Key>
+      <PropertyRef Name="id" />
+      <PropertyRef Name="SearchTerm" />
+    </Key>
+    <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="SearchTerm" Type="nvarchar" MaxLength="140" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Tweeted">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Text" Type="nvarchar" MaxLength="250" Nullable="false" />
+    <Property Name="Timestamp" Type="datetime" Nullable="false" />
+    <Property Name="Action" Type="nvarchar" MaxLength="50" Nullable="false" />
+    <Property Name="Username" Type="nvarchar" MaxLength="50" />
+    <Property Name="TweetId" Type="float" />
+  </EntityType>
+  <EntityType Name="Tweets">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="tweet" Type="nvarchar" MaxLength="140" Nullable="false" />
+    <Property Name="timestamp" Type="datetime" Nullable="false" />
+    <Property Name="tweeted" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityContainer Name="TweetBotDBModelStoreContainer">
+    <EntitySet Name="BannedWords" EntityType="Self.BannedWords" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Configuration" EntityType="Self.Configuration" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Hashtags" EntityType="Self.Hashtags" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Links" EntityType="Self.Links" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Tweeted" EntityType="Self.Tweeted" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Tweets" EntityType="Self.Tweets" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="SearchTerms" EntityType="Self.SearchTerms" store:Type="Tables" store:Schema="dbo">
+      <DefiningQuery>SELECT 
+    [SearchTerms].[id] AS [id], 
+    [SearchTerms].[SearchTerm] AS [SearchTerm]
+    FROM [dbo].[SearchTerms] AS [SearchTerms]</DefiningQuery>
+    </EntitySet>
+  </EntityContainer>
+</Schema>

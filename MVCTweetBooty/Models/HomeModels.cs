@@ -1,6 +1,8 @@
 ﻿using log4net;
+using MVCTweetBooty.Objects;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -30,6 +32,8 @@ namespace MVCTweetBooty.Models
 
         System.Timers.Timer FifteenMinuteTimer = new System.Timers.Timer();
         System.Timers.Timer OneHourTimer = new System.Timers.Timer();
+
+        public Actions actionDialog;
 
         public int TweetsByTheHour = 0;
         public int RTsByTheHour = 0;
@@ -63,12 +67,35 @@ namespace MVCTweetBooty.Models
 
         public HomeModels()
         {
+            actionDialog = new Actions();
             Connect();
             ScanForMedia();
         }
 
+        public void getConfiguration()
+        {
+            using (TweetBotDBEntities bd = new TweetBotDBEntities())
+            {
+                var config = (from cfg in bd.Configurations
+                              select cfg).FirstOrDefault();
+
+                _consumerKey = config.ConsumerKey;
+                _consumerSecret = config.ConsumerSecret;
+                _accessToken = config.AccessToken;
+                _accessTokenSecret = config.AccessTokenSecret;
+                TweetsByTheHour = config.TweetLimit;
+                RTsByTheHour = config.TweetLimit;
+                FavsByTheHour = config.FavLimit;
+                FollowsByTheHour = config.FollowLimit;
+                FavCounter = config.FavCounter;
+                TweetCounter = config.TweetCounter;
+                FollowCounter = config.FollowCounter;
+            }
+        }
+
         public void Connect()
         {
+            getConfiguration();
             MvcApplication.service = new TwitterService(_consumerKey, _consumerSecret);
             MvcApplication.service.AuthenticateWith(_accessToken, _accessTokenSecret);
         }
@@ -396,14 +423,11 @@ namespace MVCTweetBooty.Models
                 fav.Id = tweetID;
                 MvcApplication.service.FavoriteTweet(fav);
                 RateLimit(MvcApplication.service.Response.RateLimitStatus);
-                int counter = Convert.ToInt32(FavCounter);
                 if (MvcApplication.service.Response.StatusDescription == "OK")
                 {
                     SaveAction("Favorite", tweet, tweetID, " ");
-                    counter++;
+
                 }
-                FavCounter = counter;
-                //getLog();
             }
             catch (Exception ex)
             {
@@ -447,7 +471,7 @@ namespace MVCTweetBooty.Models
         public void Recommended()
         {
             ListFriendsOptions Friends = new ListFriendsOptions();
-            Friends.ScreenName = "nalgaprontacom";
+            Friends.ScreenName = "controlzetaweb";
             Friends.Count = 500;
             friendList = MvcApplication.service.ListFriends(Friends);
             string status = "#MustFollow : ";
@@ -572,6 +596,34 @@ namespace MVCTweetBooty.Models
             {
                 using (TweetBotDBEntities bd = new TweetBotDBEntities())
                 {
+                    var config = (from cfg in bd.Configurations
+                                  select cfg).FirstOrDefault();
+
+                    FavCounter = config.FavCounter;
+                    TweetCounter = config.TweetCounter;
+                    FollowCounter = config.FollowCounter;
+
+                    switch(action)
+                    {
+                        case "Favorite":
+                            FavCounter += 1;
+                            config.FavCounter = FavCounter;
+                            break;
+                        case "ReTweet":
+                        case "Tweet":
+                            TweetCounter += 1;
+                            config.TweetCounter = TweetCounter;
+                            break;
+                        case "Follow":
+                            FollowCounter += 1;
+                            config.FollowCounter = FollowCounter;
+                            break;
+                        case "Unfollow":
+                            FollowCounter -= 1;
+                            config.FollowCounter = FollowCounter;
+                            break;
+                    }
+                    bd.Entry(config).State = EntityState.Modified;
                     Tweeted t = new Tweeted();
                     t.Action = action;
                     t.Text = text;
