@@ -45,7 +45,9 @@ function GetHashtagByCountry() {
         },
         error: function (xhr, ajaxOptions, thrownError) {
             console.log(xhr.error);
-            alert("Ajax Failed!!!");
+            $.growl.error({ message: "Ajax failed!: " + xhr.error });
+
+            //alert("Ajax Failed!!!");
         }
     }); // end ajax call
 }
@@ -162,11 +164,14 @@ function Tweet() {
         success: function (data) {
             console.log(data);
             RefreshLabels(data);
+            $.growl({ title: "Tweet", message: $('#TweetText').val() });
         },
         error: function (xhr, ajaxOptions, thrownError) {
             console.log(xhr.error);
             console.log(thrownError);
             console.log(ajaxOptions);
+            $.growl.error({ message: xhr.error });
+
         }
     }); // end ajax call
 }
@@ -237,11 +242,13 @@ function RetweetSomething() {
         success: function (data) {
             console.log(data);
             RefreshLabels(data);
+            $.growl.notice({ message: "Just Retweeted something!" });
         },
         error: function (xhr, ajaxOptions, thrownError) {
             console.log(xhr.error);
             console.log(thrownError);
             console.log(ajaxOptions);
+            $.growl.error({ message: "Ajax failed!: " + xhr.error });
         }
     }); // end ajax call
 }
@@ -256,11 +263,13 @@ function FavoriteSomething() {
         success: function (data) {
             console.log(data);
             RefreshLabels(data);
+            $.growl.notice({ message: "Just Favorite something!" });
         },
         error: function (xhr, ajaxOptions, thrownError) {
             console.log(xhr.error);
             console.log(thrownError);
             console.log(ajaxOptions);
+            $.growl.error({ message: "Ajax failed!: " + xhr.error });
         }
     }); // end ajax call
 }
