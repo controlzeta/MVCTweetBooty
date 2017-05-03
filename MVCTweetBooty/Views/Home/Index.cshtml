@@ -60,7 +60,7 @@
     <li role="presentation" class="active"><a data-toggle="tab" href="#tweetExplorer">Tweet Explorer</a></li>
     <li role="presentation"><a data-toggle="tab" href="#hashtagExplorer">Hashtag Explorer</a></li>
     <li role="presentation"><a data-toggle="tab" href="#tweetMentions" onclick="GetMentions();">Tweet Mentions</a></li>
-    <li role="presentation"><a data-toggle="tab" onclick="GetOldTweets();" href="#messages">Tweet Something</a></li>
+    <li role="presentation"><a data-toggle="tab" id="tabTweetSomething" href="#messages">Tweet Something</a></li>
 </ul>
 <div class="row">
     <div class="tab-content">
@@ -247,14 +247,18 @@
                         </div>
                         <div class="row">
                             <div class="col-md-12">
-                                <table id="TweetsDT" style="width:100%" class="table-responsive table-bordered">
+                                <table id="SearchTermsDT" style="width:100%" class="table-responsive table-bordered">
                                     <thead>
                                         <tr>
                                             <th>ID</th>
+                                            <th>RT</th>
+                                            <th>LOV</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
+                                            <td>-</td>
+                                            <td>-</td>
                                             <td>-</td>
                                         </tr>
                                     </tbody>

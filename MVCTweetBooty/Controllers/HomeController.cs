@@ -108,7 +108,18 @@ namespace MVCTweetBooty.Controllers
                 MaxJsonLength = 86753090
             };
         }
-        
+
+        [HttpPost]
+        public JsonResult GetSearchTerms()
+        {
+            HomeModels m = new HomeModels();
+            return new JsonResult()
+            {
+                Data = m.GetSearchTerms(),
+                MaxJsonLength = 86753090
+            };
+        }
+
         public ActionResult About()
         {
             ViewBag.Message = "Your app description page.";

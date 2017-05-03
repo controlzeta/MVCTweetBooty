@@ -56,6 +56,7 @@ namespace MVCTweetBooty.Models
         public List<Tweeted> OldTweets = new List<Tweeted>();
         public List<TwitterStatus> mentions = new List<TwitterStatus>();
         public List<SelectListItem> ResultsNumber = new List<SelectListItem>();
+        public List<SearchTerm> searchTerms = new List<SearchTerm>();
         public int idResultNumber { get; set; }
         public int CountryId { get; set; }
         public List<SelectListItem> Countries { get; set; }
@@ -251,6 +252,17 @@ namespace MVCTweetBooty.Models
 
             }
             return statuses;
+        }
+
+        public List<SearchTerm> GetSearchTerms()
+        {
+            using (TweetBotDBEntities bd = new TweetBotDBEntities())
+            {
+                Random rnd = new Random();
+                List<SearchTerm> lsST = (from li in bd.SearchTerms
+                                         select li).ToList();
+                return lsST;
+            }
         }
 
         public string GetSearchTerm()

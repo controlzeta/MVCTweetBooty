@@ -331,3 +331,69 @@ function GetMentions() {
         }
     }); // end ajax call
 }
+
+function GetSearchTerms() {
+    $.ajax({
+        //cache: false,
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: 'json',
+        url: "/Home/GetSearchTerms",
+        success: function (data) {
+            console.log(data);
+            $('#SearchTermsDT').DataTable({
+                "sDom": '<"top"lf>rt<"bottom"p><"clear">',
+                "lengthMenu": [[25, 35, 50, -1], [25, 35, 50, "All"]],
+                "destroy": true,
+                "data": data,
+                "columns": [
+                    {
+                        "data": "SearchTerm1" // SearchTerm
+                    },
+                    {
+                        "data": "id"  //id
+                    },
+                    {
+                        "data": "id"  //id
+                    }
+                ],
+                "columnDefs": [
+                    {
+                        "title": "SearchTerm",
+                        "targets": 0
+                    },
+                    {
+                        "title": "RT",
+                        "targets": 1
+                        ,
+                        "render": function (data, type, row) {
+                            return '<a class="btn btn-success" href="' + row["SearchTerm1"] + '" target="_blank">  <i class="fa fa-exchange" ></i> </a>';
+
+                        }
+                    },
+                    {
+                        "title": "LOV",
+                        "targets": 2
+                        ,
+                        "render": function (data, type, row) {
+                            return '<a class="btn btn-danger" href="' + row["SearchTerm1"] + '" target="_blank">  <i class="fa fa-heart" ></i> </a>';
+
+                        }
+                    }
+                ]
+            });
+            RefreshLabels(data);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            console.log(xhr.error);
+            console.log(thrownError);
+            console.log(ajaxOptions);
+        }
+    }); // end ajax call
+    
+}
+
+$('#tabTweetSomething').click(function () {
+    GetOldTweets();
+    GetSearchTerms();
+});
