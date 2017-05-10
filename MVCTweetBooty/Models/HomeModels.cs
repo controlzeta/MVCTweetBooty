@@ -165,22 +165,22 @@ namespace MVCTweetBooty.Models
                             var statuses = GetBestTweets();
                             if (statuses.Count > 0)
                             {
-                                FavTweet(statuses.ElementAt(0).Id, statuses.ElementAt(0).Text);
+                                FavTweet(statuses.ElementAt(0).Id, statuses.ElementAt(0).Text, statuses.ElementAt(0).User.ScreenName);
                             }
                             break;
                         case 3: //RT
                             var statuses2 = GetBestTweets();
                             if (statuses2.Count > 0)
                             {
-                                RTTweet(statuses2.ElementAt(0).Id, statuses2.ElementAt(0).Text);
+                                RTTweet(statuses2.ElementAt(0).Id, statuses2.ElementAt(0).Text, statuses2.ElementAt(0).User.ScreenName);
                             }
                             break;
                         case 4: //RT & FAV
                             var statuses3 = GetBestTweets();
                             if (statuses3.Count > 0)
                             {
-                                FavTweet(statuses3.ElementAt(0).Id, statuses3.ElementAt(0).Text);
-                                RTTweet(statuses3.ElementAt(0).Id, statuses3.ElementAt(0).Text);
+                                FavTweet(statuses3.ElementAt(0).Id, statuses3.ElementAt(0).Text, statuses3.ElementAt(0).User.ScreenName);
+                                RTTweet(statuses3.ElementAt(0).Id, statuses3.ElementAt(0).Text, statuses3.ElementAt(0).User.ScreenName);
                             }
                             break;
                         //case 5: //Recommend
@@ -262,6 +262,44 @@ namespace MVCTweetBooty.Models
                 List<SearchTerm> lsST = (from li in bd.SearchTerms
                                          select li).ToList();
                 return lsST;
+            }
+        }
+
+        public string FavoriteTerm(string term)
+        {
+            TwitterSearchResult tweets = Search(term, 250, 0);
+            List<TwitterStatus> statuses = new List<TwitterStatus>();
+            if (tweets != null)
+            {
+                statuses = (from x in tweets.Statuses
+                            orderby x.RetweetCount descending
+                            select x).ToList();
+
+                FavTweet(statuses.ElementAt(0).Id, statuses.ElementAt(0).Text, statuses.ElementAt(0).User.ScreenName);
+                return "Just Fav!: " + statuses.ElementAt(0).Text;
+            }
+            else
+            {
+                return "Nothing to Fav";
+            }
+            
+        }
+
+        public string RetweetTerm(string term)
+        {
+            TwitterSearchResult tweets = Search(term, 250, 0);
+            List<TwitterStatus> statuses = new List<TwitterStatus>();
+            if (tweets != null)
+            {
+                statuses = (from x in tweets.Statuses
+                            orderby x.RetweetCount descending
+                            select x).ToList();
+                RTTweet(statuses.ElementAt(0).Id, statuses.ElementAt(0).Text, statuses.ElementAt(0).User.ScreenName);
+                return "Just RT!: " + statuses.ElementAt(0).Text;
+            }
+            else
+            {
+                return "Nothing to Fav";
             }
         }
 
@@ -427,7 +465,7 @@ namespace MVCTweetBooty.Models
             }
         }
 
-        public void FavTweet(long tweetID, string tweet)
+        public void FavTweet(long tweetID, string tweet, string username = "" )
         {
             try
             {
@@ -437,7 +475,7 @@ namespace MVCTweetBooty.Models
                 RateLimit(MvcApplication.service.Response.RateLimitStatus);
                 if (MvcApplication.service.Response.StatusDescription == "OK")
                 {
-                    SaveAction("Favorite", tweet, tweetID, " ");
+                    SaveAction("Favorite", tweet, tweetID, username);
 
                 }
             }
@@ -447,7 +485,7 @@ namespace MVCTweetBooty.Models
             }
         }
 
-        public void RTTweet(long tweetID, string tweet)
+        public void RTTweet(long tweetID, string tweet, string username = "")
         {
             RetweetOptions rt = new RetweetOptions();
             rt.Id = tweetID;
@@ -456,7 +494,7 @@ namespace MVCTweetBooty.Models
             int counter = Convert.ToInt32(TweetCounter);
             if (MvcApplication.service.Response.StatusDescription == "OK")
             {
-                SaveAction("ReTweet", tweet, tweetID, " ");
+                SaveAction("ReTweet", tweet, tweetID, username);
                 counter++;
             }
             TweetCounter = counter;
@@ -575,14 +613,6 @@ namespace MVCTweetBooty.Models
             {
                 log.Error("No se pudieron mostrar las menciones: ", ex);
             }
-            //foreach (TwitterStatus t in mentions)
-            //{
-            //    //DataGridViewRow row = (DataGridViewRow)dgvMentions.Rows[0].Clone();
-            //    //row.Cells[0].Value = t.Author.ScreenName;                   //UserName
-            //    //row.Cells[1].Value = t.Text;                                //Text
-            //    //row.Cells[2].Value = t.Id.ToString();                         //Id
-            //    //dgvMentions.Rows.Add(row);
-            //}
         }
 
         public void getOldTweets(int howMany = 50)
@@ -644,6 +674,7 @@ namespace MVCTweetBooty.Models
                     t.Username = Username;
                     bd.Tweeteds.Add(t);
                     bd.SaveChanges();
+                    getOldTweets();
                 }
             }
             catch (Exception ex)

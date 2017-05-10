@@ -204,6 +204,7 @@ function GetOldTweets() {
                 "sDom": '<"top"lf>rt<"bottom"p><"clear">',
                 "lengthMenu": [[25, 35, 50, -1], [25, 35, 50, "All"]],
                 "destroy": true,
+                 "order": [[ 3, "desc" ]],
                 "data": data,
                 "columns": [
                     {
@@ -221,6 +222,16 @@ function GetOldTweets() {
                     {
                         "data": "Username"
                     }
+                ],
+                "columnDefs": [
+                   {
+                       "title": "Timestamp",
+                       "targets": 2,
+                       "render": function (data, type, row) {
+                           return parseJsonDate(row["Timestamp"]);
+
+                       }
+                   }
                 ]
             });
         },
@@ -361,13 +372,18 @@ function GetSearchTerms() {
                     {
                         "title": "SearchTerm",
                         "targets": 0
+                        ,
+                        "render": function (data, type, row) {
+                            return '<a  id="' + row["id"] + '"> ' + row["SearchTerm1"] + ' </a>';
+
+                        }
                     },
                     {
                         "title": "RT",
                         "targets": 1
                         ,
                         "render": function (data, type, row) {
-                            return '<a class="btn btn-success" href="' + row["SearchTerm1"] + '" target="_blank">  <i class="fa fa-exchange" ></i> </a>';
+                            return '<a class="btn btn-success" onclick="FavoriteTerm(' + row["id"] + ');" >  <i class="fa fa-exchange" ></i> </a>';
 
                         }
                     },
@@ -376,7 +392,7 @@ function GetSearchTerms() {
                         "targets": 2
                         ,
                         "render": function (data, type, row) {
-                            return '<a class="btn btn-danger" href="' + row["SearchTerm1"] + '" target="_blank">  <i class="fa fa-heart" ></i> </a>';
+                            return '<a class="btn btn-danger" onclick="RetweetTerm(' + row["id"] + ');" >  <i class="fa fa-heart" ></i> </a>';
 
                         }
                     }
@@ -393,7 +409,59 @@ function GetSearchTerms() {
     
 }
 
+function FavoriteTerm(term) {
+    var aux = "#" + term;
+    //console.log(aux);
+    $.ajax({
+        //cache: false,
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: 'json',
+        url: "/Home/FavTerm",
+        data: " { term : '" + $(aux).text() + "' } ",
+        success: function (data) {
+            console.log(data);
+            //RefreshLabels(data);
+            $.growl.notice({ message: data });
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            console.log(xhr.error);
+            console.log(thrownError);
+            console.log(ajaxOptions);
+            $.growl.error({ message: "Ajax failed!: " + xhr.error });
+        }
+    }); // end ajax call
+}
+
+function RetweetTerm(term) {
+    var aux = "#" + term;
+    //console.log(aux);
+    $.ajax({
+        //cache: false,
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: 'json',
+        url: "/Home/RetweetTerm",
+        data: " { term : '" + $(aux).text() + "' } ",
+        success: function (data) {
+            console.log(data);
+            $.growl.notice({ message: data });
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            console.log(xhr.error);
+            console.log(thrownError);
+            console.log(ajaxOptions);
+            $.growl.error({ message: "Ajax failed!: " + xhr.error });
+        }
+    }); // end ajax call
+}
+
 $('#tabTweetSomething').click(function () {
     GetOldTweets();
     GetSearchTerms();
 });
+
+function parseJsonDate(jsonDate) {
+    var date = new Date(parseInt(jsonDate.substr(6)));
+    return date;
+}
