@@ -58,7 +58,7 @@
 </div>
 <ul class="nav nav-tabs">
     <li role="presentation" class="active"><a data-toggle="tab" href="#tweetExplorer">Tweet Explorer</a></li>
-    <li role="presentation"><a data-toggle="tab" href="#hashtagExplorer">Hashtag Explorer</a></li>
+    <li role="presentation"><a data-toggle="tab" href="#hashtagExplorer" onclick="GetHashtags();">Hashtag Explorer</a></li>
     <li role="presentation"><a data-toggle="tab" href="#tweetMentions" onclick="GetMentions();">Tweet Mentions</a></li>
     <li role="presentation"><a data-toggle="tab" id="tabTweetSomething" href="#messages">Tweet Something</a></li>
 </ul>
@@ -140,8 +140,26 @@
         </div>                                                      <!-- Tweet Explorer -->
         <div id="hashtagExplorer" class="tab-pane fade">            <!-- Hashtag Explorer -->
             <div style="min-height: 450px; padding-top: 15px;">
-                <h3>Menu 1</h3>
-                <p>Some content in menu 1.</p>
+                <div class="col-md-12">
+                    <table id="HashtagDT" class="table-responsive table-bordered">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Author</th>
+                                <th>Tweet</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>  
         </div>                                                      <!-- Hashtag Explorer -->
         <div id="tweetMentions" class="tab-pane fade">              <!-- Tweet Mentions -->
@@ -242,7 +260,7 @@
                                     <i class="fa fa-heart"></i> Favorite!</a>
                             </div>
                             <div class="col-md-4">
-                                <a class="btn btn-success form-control">Button!</a>
+                                <a onclick="$('#modalInsertTerm').modal();" class="btn btn-success form-control">Insert Term!</a>
                             </div>
                         </div>
                         <div class="row">
@@ -271,6 +289,36 @@
         </div>                                                      <!--    Messages    -->
     </div>
 </div>
+<!-- Modal -->
+<div id="modalInsertTerm" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Insert Term</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>Term:</label>
+                    </div>
+                    <div class="col-md-9">
+                        <input id="termInput" class="form-control" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a onclick="InsertTerm();" class="btn btn-info form-control">
+                    <i class="fa fa-save"></i> Save!
+                </a>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- End Modal -->
 <script src="/Scripts/main.js"></script>
 <script>
     var minutesLabel = document.getElementById("minutes");

@@ -183,6 +183,7 @@ function RefreshLabels(data) {
         $('#FollowCounter').text(data.FollowCounter);
         $('#NumFotos').text(data.NumFotos);
         $('#rateLimit').text(data.rateLimit);
+        popMessage(data.growlMessage, data.growlType);
     }
     catch (e) {
         console.log(e);
@@ -253,7 +254,7 @@ function RetweetSomething() {
         success: function (data) {
             console.log(data);
             RefreshLabels(data);
-            $.growl.notice({ message: "Just Retweeted something!" });
+            //$.growl.notice({ message: "Just Retweeted something!" });
         },
         error: function (xhr, ajaxOptions, thrownError) {
             console.log(xhr.error);
@@ -274,7 +275,7 @@ function FavoriteSomething() {
         success: function (data) {
             console.log(data);
             RefreshLabels(data);
-            $.growl.notice({ message: "Just Favorite something!" });
+            //$.growl.notice({ message: "Just Favorite something!" });
         },
         error: function (xhr, ajaxOptions, thrownError) {
             console.log(xhr.error);
@@ -330,6 +331,14 @@ function GetMentions() {
                              return '<a href="' + root + row["Author"].ScreenName + '" target="_blank"> @' + data + '</a>';
 
                          }
+                     },
+                     {
+                         "title": "Date",
+                         "targets": 3,
+                         "render": function (data, type, row) {
+                             return parseJsonDate(row["CreatedDate"]);
+
+                         }
                      }
                 ]
             });
@@ -341,6 +350,10 @@ function GetMentions() {
             console.log(ajaxOptions);
         }
     }); // end ajax call
+}
+
+function GetHashtags() {
+    $('#HashtagDT').DataTable();
 }
 
 function GetSearchTerms() {
@@ -421,8 +434,8 @@ function FavoriteTerm(term) {
         data: " { term : '" + $(aux).text() + "' } ",
         success: function (data) {
             console.log(data);
-            //RefreshLabels(data);
-            $.growl.notice({ message: data });
+            RefreshLabels(data);
+            //$.growl.notice({ message: data.growlMessage });
         },
         error: function (xhr, ajaxOptions, thrownError) {
             console.log(xhr.error);
@@ -445,7 +458,7 @@ function RetweetTerm(term) {
         data: " { term : '" + $(aux).text() + "' } ",
         success: function (data) {
             console.log(data);
-            $.growl.notice({ message: data });
+            RefreshLabels(data);
         },
         error: function (xhr, ajaxOptions, thrownError) {
             console.log(xhr.error);
@@ -456,6 +469,33 @@ function RetweetTerm(term) {
     }); // end ajax call
 }
 
+function InsertTerm() {
+    if ($('#termInput').val() != "") {
+        $.ajax({
+            //cache: false,
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            url: "/Home/InsertTerm",
+            data: " { term : '" + $('#termInput').val() + "' } ",
+            success: function (data) {
+                console.log(data);
+                RefreshLabels(data);
+                GetSearchTerms();
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                console.log(xhr.error);
+                console.log(thrownError);
+                console.log(ajaxOptions);
+                $.growl.error({ message: "Ajax failed!: " + xhr.error });
+            }
+        }); // end ajax call
+    } else {
+        $('#termInput').focus();
+        $.growl.error({ message: "You need to write a term to insert" });
+    }
+}
+
 $('#tabTweetSomething').click(function () {
     GetOldTweets();
     GetSearchTerms();
@@ -464,4 +504,20 @@ $('#tabTweetSomething').click(function () {
 function parseJsonDate(jsonDate) {
     var date = new Date(parseInt(jsonDate.substr(6)));
     return date;
+}
+
+function popMessage(Message, type) {
+    if (Message != null && Message != "") { 
+        switch (type) {
+            case "success":
+                $.growl.notice({ message: Message });
+                break;
+            case "error":
+                $.growl.error({ message: Message });
+                break;
+            case "warning":
+                $.growl.warning({ message: Message });
+                break;
+        }
+    }
 }

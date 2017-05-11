@@ -29,7 +29,8 @@ namespace MVCTweetBooty.Models
         public string query = "";
         public string TweetText = "";
         public string Errors = "";
-
+        public string growlMessage = "";
+        public string growlType = "success";
         System.Timers.Timer FifteenMinuteTimer = new System.Timers.Timer();
         System.Timers.Timer OneHourTimer = new System.Timers.Timer();
 
@@ -265,9 +266,9 @@ namespace MVCTweetBooty.Models
             }
         }
 
-        public string FavoriteTerm(string term)
+        public void FavoriteTerm(string term)
         {
-            TwitterSearchResult tweets = Search(term, 250, 0);
+            TwitterSearchResult tweets = Search(term, 250, 2);
             List<TwitterStatus> statuses = new List<TwitterStatus>();
             if (tweets != null)
             {
@@ -276,18 +277,19 @@ namespace MVCTweetBooty.Models
                             select x).ToList();
 
                 FavTweet(statuses.ElementAt(0).Id, statuses.ElementAt(0).Text, statuses.ElementAt(0).User.ScreenName);
-                return "Just Fav!: " + statuses.ElementAt(0).Text;
+                growlMessage = "Just Fav!: " + statuses.ElementAt(0).Text;
             }
             else
             {
-                return "Nothing to Fav";
+                growlMessage = "Nothing to Fav";
+                growlType = "error";
             }
             
         }
 
-        public string RetweetTerm(string term)
+        public void RetweetTerm(string term)
         {
-            TwitterSearchResult tweets = Search(term, 250, 0);
+            TwitterSearchResult tweets = Search(term, 250, 2);
             List<TwitterStatus> statuses = new List<TwitterStatus>();
             if (tweets != null)
             {
@@ -295,12 +297,35 @@ namespace MVCTweetBooty.Models
                             orderby x.RetweetCount descending
                             select x).ToList();
                 RTTweet(statuses.ElementAt(0).Id, statuses.ElementAt(0).Text, statuses.ElementAt(0).User.ScreenName);
-                return "Just RT!: " + statuses.ElementAt(0).Text;
+                growlMessage = "Just RT!: " + statuses.ElementAt(0).Text;
             }
             else
             {
-                return "Nothing to Fav";
+                growlMessage = "Nothing to RT";
+                growlType = "error";
             }
+        }
+
+        public void InsertTerm(string term)
+        {
+            try
+            {
+                using (TweetBotDBEntities bd = new TweetBotDBEntities())
+                {
+                    SearchTerm searchTerm = new SearchTerm();
+                    searchTerm.SearchTerm1 = term;
+                    bd.SearchTerms.Add(searchTerm);
+                    bd.SaveChanges();
+                    growlMessage = "Inserted term: " + term;
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("No se pudo guardar la acción: " +  ex);
+                growlMessage = "Couldn't Insert term";
+                growlType = "error";
+            }
+
         }
 
         public string GetSearchTerm()
@@ -421,6 +446,7 @@ namespace MVCTweetBooty.Models
                 if (result != null)
                 {
                     SaveAction("Tweet", Status, result.Id, result.User.ScreenName);
+                    growlMessage = "Just Tweeted!: " + Status;
                     return true;
                 }
                 else
@@ -429,6 +455,8 @@ namespace MVCTweetBooty.Models
             catch (Exception ex)
             {
                 log.Error("No se pudo enviar el Tweet", ex);
+                growlMessage = "Couldn't tweet!: " + Status;
+                growlType = "error";
                 return false;
             }
         }
@@ -441,11 +469,14 @@ namespace MVCTweetBooty.Models
                 if (statuses.Count > 0)
                 {
                     RTTweet(statuses.ElementAt(0).Id, statuses.ElementAt(0).Text);
+                    growlMessage = "Just RT! : " + statuses.ElementAt(0).Text;
                 }
             }
             catch (Exception ex)
             {
                 log.Error("No se pudo Retwitear el Tweet", ex);
+                growlMessage = "Couldn't RT! ";
+                growlType = "error";
             }
         }
 
@@ -457,11 +488,14 @@ namespace MVCTweetBooty.Models
                 if (statuses.Count > 0)
                 {
                     FavTweet(statuses.ElementAt(0).Id, statuses.ElementAt(0).Text);
+                    growlMessage = "Just RT! : " + statuses.ElementAt(0).Text;
                 }
             }
             catch (Exception ex)
             {
                 log.Error("No se pudo Retwitear el Tweet", ex);
+                growlMessage = "Couldn't Fav! ";
+                growlType = "error";
             }
         }
 

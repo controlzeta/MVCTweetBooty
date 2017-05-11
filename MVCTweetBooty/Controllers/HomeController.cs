@@ -124,9 +124,10 @@ namespace MVCTweetBooty.Controllers
         public JsonResult RetweetTerm(string term)
         {
             HomeModels m = new HomeModels();
+            m.RetweetTerm(term);
             return new JsonResult()
             {
-                Data = m.RetweetTerm(term),
+                Data = m,
                 MaxJsonLength = 86753090
             };
         }
@@ -135,9 +136,22 @@ namespace MVCTweetBooty.Controllers
         public JsonResult FavTerm(string term)
         {
             HomeModels m = new HomeModels();
+            m.FavoriteTerm(term);
             return new JsonResult()
             {
-                Data = m.FavoriteTerm(term),
+                Data = m,
+                MaxJsonLength = 86753090
+            };
+        }
+
+        [HttpPost]
+        public JsonResult InsertTerm(string term)
+        {
+            HomeModels m = new HomeModels();
+            m.InsertTerm(term);
+            return new JsonResult()
+            {
+                Data = m,
                 MaxJsonLength = 86753090
             };
         }
