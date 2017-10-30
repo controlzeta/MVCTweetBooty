@@ -328,6 +328,61 @@ namespace MVCTweetBooty.Models
 
         }
 
+        public List<TwitterUser> unfollowMuebles(string userName)
+        {
+            DateTime lastTweetDate = new DateTime();
+            List<TwitterUser> followers = new List<TwitterUser>();
+            List<TwitterUser> unfollowed = new List<TwitterUser>();
+            followers = getFollowers(userName, 10);
+            foreach (TwitterUser user in followers)
+            {
+                lastTweetDate = getLastTweetDate(userName);
+                if (lastTweetDate > DateTime.Now.AddDays(-30))
+                {
+                    Follow(false, user.ScreenName);
+                    unfollowed.Add(user);
+                }
+            }
+            return unfollowed;
+        }
+
+        public List<TwitterUser> getFollowers(string userName, int followerQty)
+        {
+            //List<TwitterUser> followers = new List<TwitterUser>();
+            List<TwitterUser> ret = new List<TwitterUser>();
+            ListFollowersOptions request = new ListFollowersOptions();
+            request.ScreenName = userName;
+            request.Count = followerQty;
+            request.IncludeUserEntities = true;
+            var followers = MvcApplication.service.ListFollowers(request);
+            ret.AddRange(followers);
+            while (followers.NextCursor != null && followers.NextCursor.Value > 0)
+            {
+                followers = MvcApplication.service.ListFollowers( new ListFollowersOptions { Cursor = followers.NextCursor });
+                ret.AddRange(followers);
+            }
+            return ret;
+    }
+
+        public DateTime getLastTweetDate(string userName)
+        {
+            ListTweetsOnUserTimelineOptions request = new ListTweetsOnUserTimelineOptions();
+            request.ScreenName = userName;
+            request.Count = 100;
+            List<TwitterStatus> tweets = MvcApplication.service.ListTweetsOnUserTimeline(request).ToList();
+            //Order Tweets
+            tweets = tweets.OrderByDescending(m => m.CreatedDate).ToList();
+            return tweets.FirstOrDefault().CreatedDate;
+        }
+
+        public void getFavoriteTweets()
+        {
+            ListFavoriteTweetsOptions request = new ListFavoriteTweetsOptions();
+            List<TwitterStatus> tweets = MvcApplication.service.ListFavoriteTweets(request).ToList();
+        }
+
+        //public virtual IEnumerable<TwitterStatus> ListFavoriteTweets(ListFavoriteTweetsOptions options);
+
         public string GetSearchTerm()
         {
             using (TweetBotDBEntities bd = new TweetBotDBEntities())
@@ -337,7 +392,6 @@ namespace MVCTweetBooty.Models
                                 select li).ToList();
                 return lsST.ElementAt(rnd.Next(0, lsST.Count)).SearchTerm1;
             }
-            
         }
 
         public void GetCountries()
